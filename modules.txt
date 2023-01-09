@@ -1,0 +1,3 @@
+jdk-17_windows-x64_bin.msi
+mysql-installer-community-8.0.31.0.msi
+SceneBuilder-19.0.0.msi
