@@ -1,5 +1,6 @@
 package Model;
 
+import DBAccess.Appointments;
 import DBAccess.Contacts;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,6 +16,7 @@ public class Appointment {
     String dateStart;
     String dateEnd;
     int customerID;
+    String customerName;
     int userID;
 
     public Appointment(Integer appointmentID, String title, String description, String location, int contactID, String type, String date_start, String date_end, int customerID, int userID) {
@@ -28,6 +30,7 @@ public class Appointment {
         this.dateStart = date_start;
         this.dateEnd = date_end;
         this.customerID = customerID;
+        this.customerName = Appointments.lookupAppointmentCustomer(customerID);
         this.userID = userID;
     }
 
@@ -49,6 +52,12 @@ public class Appointment {
     public String getContactName() {
         return contactName;
     }
+    public int getCustomerID() {
+        return customerID;
+    }
+    public void setCustomerID(int customerID) {
+        this.customerID = customerID;
+    }
     public String getType() {
         return type;
     }
@@ -58,8 +67,11 @@ public class Appointment {
     public String getDateEnd() {
         return dateEnd;
     }
-    public int getCustomerID() {
-        return customerID;
+    public String getCustomerName() {
+        return customerName;
+    }
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
     }
     public int getUserID() {
         return userID;
@@ -96,8 +108,8 @@ public class Appointment {
         this.dateEnd = dateEnd;
     }
 
-    public void setCustomerID(int customerID) {
-        this.customerID = customerID;
+    public void setCustomerName(String name) {
+        this.customerName = name;
     }
 
     public void setUserID(int userID) {

@@ -1,0 +1,81 @@
+package Model;
+
+import DBAccess.Customers;
+
+public class Customer {
+
+    Integer customerID;
+    String name;
+    String address;
+    String postalCode;
+    String phoneNumber;
+    String division;
+    int divisionID;
+    String country;
+
+
+
+    public Customer(Integer ID, String name, String address, String postalCode, String phoneNumber, Integer division){
+        this.customerID = ID;
+        this.name = name;
+        this.address = address;
+        this.postalCode = postalCode;
+        this.phoneNumber = phoneNumber;
+        this.division = Customers.lookupCustomerDivision(division);
+        this.divisionID = division;
+        this.country = Customers.lookupCustomerCountry(division);
+        System.out.println(this.country);
+    }
+
+    public Integer getCustomerID() {
+        return customerID;
+    }
+    public void setCustomerID(Integer customerID) {
+        this.customerID = customerID;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    public String getPostalCode() {
+        return postalCode;
+    }
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+    public String getDivision() {
+        return division;
+    }
+    public void setDivision(String division) {
+        this.division = division;
+    }
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+    public int getDivisionID() {
+        return divisionID;
+    }
+
+    public void setDivisionID(int divisionID) {
+        this.divisionID = divisionID;
+    }
+
+}

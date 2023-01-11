@@ -1,18 +1,25 @@
 package com.example.appointmentmanager;
-
+import java.lang.reflect.Field;
 import DBAccess.Appointments;
 import DBAccess.Contacts;
+import DBAccess.Customers;
 import Model.Appointment;
 import Model.Contact;
+import Model.Customer;
 import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import helper.AlertBox;
+import helper.JDBC;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -23,10 +30,21 @@ public class AppointmentsController implements Initializable {
     public Button cancelAppointment;
     public Button saveCustomer;
     public Button cancelCustomer;
+    public TextField cCID;
+    public TextField cName;
+    public TextField cAddress;
+    public TextField cPostal;
+    public TextField cPhone;
+    public ComboBox cDivision;
+    @FXML
+    public ComboBox cCountry;
+    public Button modifyCustomer;
     Integer selectedIndex;
     ObservableList<Appointment> tempAppointments = Appointments.getAllAppointments();
+    ObservableList<Customer> tempCustomers = Customers.getAllCustomers();
+    ObservableList<String> divisions = FXCollections.observableArrayList();
     public TableView<Appointment> aTableView;
-    public TableView cTableView;
+    public TableView<Customer> cTableView;
     public TableColumn<Appointment, Integer> aTID;
     public TableColumn<Appointment, String>  aTTitle;
     public TableColumn<Appointment, String>  aTDesc;
@@ -37,12 +55,12 @@ public class AppointmentsController implements Initializable {
     public TableColumn<Appointment, String>  aTEnd;
     public TableColumn<Appointment, Integer>  aTCID;
     public TableColumn<Appointment, Integer>  atUID;
-    public TableColumn cTID;
-    public TableColumn cTName;
-    public TableColumn cTAddress;
-    public TableColumn cTPostalCode;
-    public TableColumn cTPhoneNumber;
-    public TableColumn cTDivision;
+    public TableColumn<Customer, Integer> cTID;
+    public TableColumn<Customer, String> cTName;
+    public TableColumn<Customer, String> cTAddress;
+    public TableColumn<Customer, String> cTPostalCode;
+    public TableColumn<Customer, String> cTPhoneNumber;
+    public TableColumn<Customer, Integer> cTDivision;
     public TableColumn cTCountry;
     public DatePicker datePick;
     public TextField aTitle;
@@ -71,13 +89,163 @@ public class AppointmentsController implements Initializable {
         aTEnd.setCellValueFactory(new PropertyValueFactory<>("dateEnd"));
         aTCID.setCellValueFactory(new PropertyValueFactory<>("customerID"));
         atUID.setCellValueFactory(new PropertyValueFactory<>("userID"));
+        cTID.setCellValueFactory(new PropertyValueFactory<>("customerID"));
+        cTName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        cTAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
+        cTPostalCode.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
+        cTPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
+        cTDivision.setCellValueFactory(new PropertyValueFactory<>("division"));
+        cTCountry.setCellValueFactory(new PropertyValueFactory<>("country"));
         try {
             aTableView.setItems(Appointments.getAllAppointments());
+            cTableView.setItems(Customers.getAllCustomers());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         appointmentDisable();
+        customerDisable();
     }
+    public void modifyCustomer(ActionEvent actionEvent) throws SQLException {
+        if (cTableView.getSelectionModel().isEmpty()){
+            AlertBox.display("Error Message", "No Customer is Selected!");
+            return;
+        }
+        cName.requestFocus();
+        dynamicLabel.setText("Modifying Customer:");
+        Customer tempC =  cTableView.getItems().get(cTableView.getSelectionModel().getSelectedIndex());
+        selectedIndex = cTableView.getSelectionModel().getSelectedIndex();
+        cName.setText(tempC.getName());
+        cCID.setText((String.valueOf(tempC.getCustomerID())));
+        cAddress.setText(String.valueOf(tempC.getAddress()));
+        cPhone.setText(String.valueOf(tempC.getPhoneNumber()));
+        cPostal.setText(String.valueOf(tempC.getPostalCode()));
+        cCountry.setItems(Customers.getAllCountries());
+        int divisionID = tempC.getDivisionID();
+        String tempCountry = tempC.getCountry();
+        cCountry.getSelectionModel().selectFirst();
+        int i = 0;
+        while (!cCountry.getItems().get(i).equals(Customers.lookupCustomerCountry(divisionID))){
+            i++;
+            cCountry.getSelectionModel().selectNext();
+        }
+        cDivision.setItems(divisions);
+        filterDivisions();
+        customerEnable();
+    }
+    public void customerEnable(){
+        cName.setDisable(false);
+        cCID.setDisable(false);
+        cAddress.setDisable(false);
+        cPhone.setDisable(false);
+        cPostal.setDisable(false);
+        cCountry.setDisable(false);
+        cDivision.setDisable(false);
+        saveCustomer.setDisable(false);
+        cancelCustomer.setDisable(false);
+    }
+    public void customerDisable(){
+        cName.setDisable(true);
+        cCID.setDisable(true);
+        cAddress.setDisable(true);
+        cPhone.setDisable(true);
+        cPostal.setDisable(true);
+        cCountry.setDisable(true);
+        cDivision.setDisable(true);
+        saveCustomer.setDisable(true);
+        cancelCustomer.setDisable(true);
+    }
+    public void addCustomer(ActionEvent actionEvent) throws SQLException {
+        customerDisable();
+        customerEnable();
+        int cid_c;
+        int N = tempCustomers.size();
+        if (N == 0) {
+            cid_c = 1;
+            cCID.setText(Integer.toString(cid_c));
+        } else {
+            int[] arr = new int[N + 1];
+            for (int i=0; i<N; i++) {
+                Customer tempCustomer = tempCustomers.get(i);
+                arr[i] = tempCustomer.getCustomerID();
+            }
+            int j;
+            int[] temp2 = new int[N + 1];
+            for (j = 0; j <= N; j++) {
+                temp2[j] = 0;
+            }
+
+            for (j = 0; j < N; j++) {
+                temp2[arr[j] - 1] = 1;
+            }
+
+            int ans = 0;
+            for (j = 0; j <= N; j++) {
+                if (temp2[j] == 0)
+                    ans = j + 1;
+            }
+            cid_c = ans;
+            cCID.setText(Integer.toString(cid_c));
+        }
+        dynamicLabel.setText("Adding a Customer:");
+        cCountry.setItems(Customers.getAllCountries());
+        cDivision.setItems(Customers.getAllDivisions());
+        cTableView.getSelectionModel().clearSelection();
+    }
+    public void createCustomer(ActionEvent actionEvent) {
+    }
+    public void cancelCustomer(ActionEvent actionEvent) throws SQLException {
+        divisions = Customers.getAllDivisions();
+        cName.clear();
+        cCID.clear();
+        cAddress.clear();
+        cPhone.clear();
+        cPostal.clear();
+        cCountry.setItems(null);
+        cDivision.setItems(null);
+        customerDisable();
+    }
+    public void deleteCustomer(ActionEvent actionEvent) throws SQLException {
+        if (!cTableView.getSelectionModel().isEmpty()) {
+            if (Customers.deleteCustomer(Customers.getAllCustomers().get(cTableView.getSelectionModel().getSelectedIndex()))){
+                AlertBox.display("Alert", "Customer was successfully deleted.");
+            }
+            else {
+                AlertBox.display("Alert", "Customer could not be deleted while having appointments.");
+            }
+        }
+        else {
+            AlertBox.display("Error Message", "No Customer was Selected.");
+        }
+        cTableView.setItems(Customers.getAllCustomers());
+        tempCustomers = Customers.getAllCustomers();
+    }
+    public void filterCountries(ActionEvent actionEvent) throws SQLException {
+//        Integer divisionInt = Customers.divisionsMap.get(cDivision.getSelectionModel().getSelectedItem());
+//        cCountry.getSelectionModel().selectFirst();
+//        for (int i = 0; i < cCountry.getItems().size(); i++){
+//            if (cCountry.getItems().get(i).equals(Customers.lookupCustomerCountry(divisionInt))){
+//                break;
+//            }
+//            else {
+//                cCountry.getSelectionModel().selectNext();
+//            }
+//        }
+    }
+    public void filterDivisions() throws SQLException {
+        divisions.clear();
+        //cDivision.setItems(Customers.getAllDivisions());
+        Integer countryInt = Customers.countriesMap.get(cCountry.getSelectionModel().getSelectedItem());
+        String sql = String.format("SELECT Division from first_level_divisions WHERE COUNTRY_ID ='%d';", countryInt);
+        PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        String divisionName = null;
+        while (rs.next()){
+            divisionName = rs.getString("Division");
+            divisions.add(divisionName);
+        }
+        cDivision.setItems(divisions);
+    }
+
 
 
     public void printDate(ActionEvent actionEvent) {
@@ -105,7 +273,7 @@ public class AppointmentsController implements Initializable {
         aLocation.setText(String.valueOf(tempA.getLocation()));
         aStart.setText(String.valueOf(tempA.getDateStart()));
         aEnd.setText(String.valueOf(tempA.getDateEnd()));
-        aCID.setText(String.valueOf(tempA.getCustomerID()));
+        aCID.setText(String.valueOf(tempA.getCustomerName()));
         aUserID.setText(String.valueOf(tempA.getUserID()));
         aType.setText(String.valueOf(tempA.getType()));
         aContact.setItems(Contacts.getAllContactNames());
@@ -158,7 +326,6 @@ public class AppointmentsController implements Initializable {
         appointmentDisable();
         appointmentEnable();
         int aid_c;
-        System.out.println(tempAppointments.size());
         int N = tempAppointments.size();
         if (N == 0) {
             aid_c = 1;
@@ -191,7 +358,6 @@ public class AppointmentsController implements Initializable {
         aContact.setItems(Contacts.getAllContactNames());
         aTableView.getSelectionModel().clearSelection();
     }
-
     public void createAppointment(ActionEvent actionEvent) throws SQLException {
         int a_id_c = 0;
         Integer ID;
@@ -360,34 +526,25 @@ public class AppointmentsController implements Initializable {
         tempAppointments = Appointments.getAllAppointments();
         appointmentDisable();
     }
-
     public void cancelAppointment(ActionEvent actionEvent) {
         appointmentDisable();
         aTableView.getSelectionModel().clearSelection();
     }
-
-
-
-
-    public void createCustomer(ActionEvent actionEvent) {
-    }
-
-    public void cancelCustomer(ActionEvent actionEvent) {
-    }
-
     public void deleteAppointment(ActionEvent actionEvent) throws SQLException {
             if (!aTableView.getSelectionModel().isEmpty()) {
                     if (Appointments.deleteAppointment(Appointments.getAllAppointments().get(aTableView.getSelectionModel().getSelectedIndex()))){
                         AlertBox.display("Alert", "Appointment was successfully deleted.");
                     }
                     else {
-                        AlertBox.display("Alert", "Product could not be deleted while having associated parts.");
+                        AlertBox.display("Alert", "Appointment could not be deleted while having associated parts.");
                     }
                 }
             else {
-                AlertBox.display("Error Message", "No Product was Selected.");
+                AlertBox.display("Error Message", "No Appointment was Selected.");
             }
             aTableView.setItems(Appointments.getAllAppointments());
             tempAppointments = Appointments.getAllAppointments();
     }
+
+
 }

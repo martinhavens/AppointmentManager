@@ -33,7 +33,7 @@ public class Appointments {
                 int customerID = rs.getInt("Customer_ID");
                 int userID = rs.getInt("User_ID");
                 Appointment c = new Appointment(app_id, title, desc, location, contactID, type, dateStart, dateEnd, customerID, userID);
-                Appointments.allAppointments.add(c);
+                allAppointments.add(c);
                 alist.add(c);
             }
         }
@@ -44,11 +44,29 @@ public class Appointments {
         return alist;
     }
 
+    public static String lookupAppointmentCustomer(Integer customerID){
+        String sql = null;
+        try {
+            sql = String.format("SELECT Customer_Name from customers WHERE Customer_ID='%d';", customerID);
+
+            PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                sql = rs.getString("Customer_Name");
+
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return(sql);
+    }
+
     public static void addAppointment(Integer ID, String title, String description, String location, int contactID, String type, String dateStart, String dateEnd, int customerID, int userID) throws SQLException {
         String sql = String.format("INSERT INTO appointments (Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, Contact_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d);", ID, title, description, location, type, dateStart, dateEnd, customerID, userID, contactID);
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         int rowsAffected = ps.executeUpdate();
-        System.out.println(rowsAffected);
     }
 
     public static void addAppointment(Appointment newAppointment) throws SQLException {
@@ -62,11 +80,9 @@ public class Appointments {
         String dateEnd = newAppointment.getDateEnd();
         int customerID = newAppointment.getCustomerID();
         int userID = newAppointment.getUserID();
-
         String sql = String.format("INSERT INTO appointments (Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, Contact_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d);", ID, title, description, location, type, dateStart, dateEnd, customerID, userID, contactID);
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         int rowsAffected = ps.executeUpdate();
-        System.out.println(rowsAffected);
     }
 
     public static boolean deleteAppointment(Appointment selectedAppointment) throws SQLException {
