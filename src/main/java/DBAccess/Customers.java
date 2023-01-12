@@ -71,6 +71,9 @@ public class Customers {
         ResultSet rs = ps.executeQuery();
         while (rs.next()){
             String dname = rs.getString("Division");
+            if (dname.equals("QuÃ©bec")){
+                dname = "Quebec";
+            }
             Integer dID = rs.getInt("Division_ID");
             dlist.add(dname);
             divisionsMap.put(dname, dID);

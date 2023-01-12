@@ -24,7 +24,6 @@ public class Customer {
         this.division = Customers.lookupCustomerDivision(division);
         this.divisionID = division;
         this.country = Customers.lookupCustomerCountry(division);
-        System.out.println(this.country);
     }
 
     public Integer getCustomerID() {
