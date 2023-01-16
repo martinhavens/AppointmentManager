@@ -6,6 +6,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Appointments {
 
@@ -28,11 +32,19 @@ public class Appointments {
                 String location = rs.getString("Location");
                 int contactID = rs.getInt("Contact_ID");
                 String type = rs.getString("Type");
-                String dateStart = rs.getString("Start");
+
+                String dateStarte = rs.getString("Start");
+                String dateSplit[] = dateStarte.split(" ", 2);
+                String dateStartDate = dateSplit[0];
+                String dateStartTime = dateSplit[1];
                 String dateEnd = rs.getString("End");
+                dateSplit = dateEnd.split(" ", 2);
+                String dateEndDate = dateSplit[0];
+                String dateEndTime = dateSplit[1];
+
                 int customerID = rs.getInt("Customer_ID");
                 int userID = rs.getInt("User_ID");
-                Appointment c = new Appointment(app_id, title, desc, location, contactID, type, dateStart, dateEnd, customerID, userID);
+                Appointment c = new Appointment(app_id, title, desc, location, contactID, type, dateStartDate, dateStartTime, dateEndDate, dateEndTime, customerID, userID);
                 allAppointments.add(c);
                 alist.add(c);
             }
@@ -76,11 +88,11 @@ public class Appointments {
         String location = newAppointment.getLocation();
         int contactID = newAppointment.getContactID();
         String type = newAppointment.getType();
-        String dateStart = newAppointment.getDateStart();
-        String dateEnd = newAppointment.getDateEnd();
+        String dateSZ = newAppointment.getDateStartDate() +" " + newAppointment.getDateStartTime();
+        String dateEZ = newAppointment.getDateEndDate() + " " + newAppointment.getDateEndTime();
         int customerID = newAppointment.getCustomerID();
         int userID = newAppointment.getUserID();
-        String sql = String.format("INSERT INTO appointments (Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, Contact_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d);", ID, title, description, location, type, dateStart, dateEnd, customerID, userID, contactID);
+        String sql = String.format("INSERT INTO appointments (Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, Contact_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d);", ID, title, description, location, type, dateSZ, dateEZ, customerID, userID, contactID);
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         int rowsAffected = ps.executeUpdate();
     }

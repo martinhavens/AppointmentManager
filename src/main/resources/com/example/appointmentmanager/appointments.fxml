@@ -8,6 +8,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -57,8 +58,6 @@
     <TextField fx:id="aDescription" layoutX="124.0" layoutY="338.0" prefHeight="25.0" prefWidth="297.0" />
     <Label layoutX="520.0" layoutY="374.0" text="Type:" />
     <TextField fx:id="aLocation" layoutX="124.0" layoutY="370.0" prefHeight="25.0" prefWidth="145.0" />
-    <TextField fx:id="aStart" layoutX="297.0" layoutY="271.0" prefHeight="25.0" prefWidth="167.0" />
-    <TextField fx:id="aEnd" layoutX="297.0" layoutY="304.0" prefHeight="25.0" prefWidth="167.0" />
     <ComboBox fx:id="aContact" layoutX="337.0" layoutY="370.0" prefHeight="25.0" prefWidth="167.0" />
     <Label layoutX="286.0" layoutY="374.0" text="Contact:" />
     <Label layoutX="436.0" layoutY="342.0" text="Customer ID:" />
@@ -67,18 +66,21 @@
     <TextField fx:id="aUserID" layoutX="652.0" layoutY="338.0" prefHeight="25.0" prefWidth="59.0" />
     <TextField fx:id="aType" layoutX="556.0" layoutY="370.0" prefHeight="25.0" prefWidth="158.0" />
     <Label layoutX="53.0" layoutY="374.0" text="Location:" />
-    <Button fx:id="saveAppointment" layoutX="494.0" layoutY="304.0" mnemonicParsing="false" onAction="#createAppointment" text="Save" />
-    <Button fx:id="cancelAppointment" layoutX="588.0" layoutY="304.0" mnemonicParsing="false" onAction="#cancelAppointment" text="Cancel" />
+    <Button fx:id="saveAppointment" layoutX="583.0" layoutY="304.0" mnemonicParsing="false" onAction="#createAppointment" text="Save" />
+    <Button fx:id="cancelAppointment" layoutX="649.0" layoutY="304.0" mnemonicParsing="false" onAction="#cancelAppointment" text="Cancel" />
     <ComboBox fx:id="cCountry" layoutX="675.0" layoutY="166.0" onAction="#filterDivisions" prefHeight="25.0" prefWidth="88.0" />
     <ComboBox fx:id="cDivision" layoutX="828.0" layoutY="166.0" prefWidth="150.0" />
     <Button fx:id="saveCustomer" layoutX="881.0" layoutY="205.0" mnemonicParsing="false" onAction="#createCustomer" text="Save" />
     <Button fx:id="cancelCustomer" layoutX="933.0" layoutY="205.0" mnemonicParsing="false" onAction="#cancelCustomer" prefHeight="25.0" prefWidth="59.0" text="Cancel" />
     <Label layoutX="262.0" layoutY="275.0" text="Start:" />
     <Label layoutX="262.0" layoutY="308.0" text="End:" />
-    <RadioButton layoutX="197.0" layoutY="639.0" mnemonicParsing="false" text="month" />
-    <RadioButton layoutX="330.0" layoutY="639.0" mnemonicParsing="false" text="week" />
-    <DatePicker fx:id="datePick" layoutX="417.0" layoutY="635.0" />
-    <Button layoutX="609.0" layoutY="635.0" mnemonicParsing="false" onAction="#printDate" prefHeight="25.0" prefWidth="42.0" text="Date" />
+    <RadioButton fx:id="monthlyFilter" layoutX="379.0" layoutY="639.0" mnemonicParsing="false" onAction="#appointmentsMonthly" text="month">
+      <toggleGroup>
+         <ToggleGroup fx:id="filterGroup" />
+      </toggleGroup></RadioButton>
+    <RadioButton fx:id="weeklyFilter" layoutX="446.0" layoutY="639.0" mnemonicParsing="false" onAction="#appointmentsWeekly" text="week" toggleGroup="$filterGroup" />
+    <DatePicker fx:id="datePick" layoutX="675.0" layoutY="635.0" />
+    <Button layoutX="753.0" layoutY="666.0" mnemonicParsing="false" onAction="#printDate" prefHeight="25.0" prefWidth="42.0" text="Date" />
     <Button fx:id="modifyAppointment" layoutX="46.0" layoutY="666.0" mnemonicParsing="false" onAction="#modifyAppointment" text="Modify Appointment" />
     <Label fx:id="dynamicLabel" layoutX="721.0" layoutY="275.0" prefHeight="126.0" prefWidth="276.0" text="Select an Option:" wrapText="true">
         <font>
@@ -90,4 +92,13 @@
     <Button fx:id="modifyCustomer" layoutX="762.0" layoutY="205.0" mnemonicParsing="false" onAction="#modifyCustomer" text="Modify Customer" />
     <Button fx:id="deleteAppointment" layoutX="46.0" layoutY="696.0" mnemonicParsing="false" onAction="#deleteAppointment" prefHeight="25.0" prefWidth="127.0" text="Delete Appointment" />
    <Button fx:id="deleteCustomer" layoutX="764.0" layoutY="240.0" mnemonicParsing="false" onAction="#deleteCustomer" text="Delete Customer" />
+   <DatePicker fx:id="endDatePick" layoutX="292.0" layoutY="304.0" prefHeight="25.0" prefWidth="124.0" />
+   <DatePicker fx:id="startDatePick" layoutX="293.0" layoutY="271.0" prefHeight="25.0" prefWidth="124.0" />
+   <ComboBox fx:id="startTimePick" layoutX="421.0" layoutY="271.0" prefHeight="25.0" prefWidth="127.0" />
+   <ComboBox fx:id="endTimePick" layoutX="421.0" layoutY="304.0" prefHeight="25.0" prefWidth="127.0" />
+   <Button fx:id="filterHigher" layoutX="516.0" layoutY="635.0" mnemonicParsing="false" text="&gt;" />
+   <Button fx:id="filterLower" layoutX="343.0" layoutY="635.0" mnemonicParsing="false" text="&lt;" />
+   <Button layoutX="421.0" layoutY="696.0" mnemonicParsing="false" onAction="#clearFilter" text="Clear" />
+   <Label layoutX="337.0" layoutY="670.0" text="Frame of Reference:" />
+   <Label fx:id="referenceFrame" layoutX="450.0" layoutY="670.0" prefHeight="17.0" prefWidth="66.0" text="All" />
 </AnchorPane>

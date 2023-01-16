@@ -5,6 +5,12 @@ import DBAccess.Contacts;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Appointment {
     Integer appointmentID;
     String title;
@@ -13,13 +19,15 @@ public class Appointment {
     int contactID;
     String contactName;
     String type;
-    String dateStart;
-    String dateEnd;
+    String dateStartDate;
+    String dateStartTime;
+    String dateEndDate;
+    String dateEndTime;
     int customerID;
     String customerName;
     int userID;
 
-    public Appointment(Integer appointmentID, String title, String description, String location, int contactID, String type, String date_start, String date_end, int customerID, int userID) {
+    public Appointment(Integer appointmentID, String title, String description, String location, int contactID, String type, String date_start_date, String dateStartTime, String date_end_date, String dateEndTime, int customerID, int userID) {
         this.appointmentID = appointmentID;
         this.title = title;
         this.description = description;
@@ -27,8 +35,10 @@ public class Appointment {
         this.contactID = contactID;
         this.contactName = Contacts.contactDictionary.get(contactID);
         this.type = type;
-        this.dateStart = date_start;
-        this.dateEnd = date_end;
+        this.dateStartDate = date_start_date;
+        this.dateStartTime = dateStartTime;
+        this.dateEndDate = date_end_date;
+        this.dateEndTime = dateEndTime;
         this.customerID = customerID;
         this.customerName = Appointments.lookupAppointmentCustomer(customerID);
         this.userID = userID;
@@ -61,12 +71,7 @@ public class Appointment {
     public String getType() {
         return type;
     }
-    public String getDateStart() {
-        return dateStart;
-    }
-    public String getDateEnd() {
-        return dateEnd;
-    }
+
     public String getCustomerName() {
         return customerName;
     }
@@ -100,17 +105,42 @@ public class Appointment {
         this.type = type;
     }
 
-    public void setDateStart(String dateStart) {
-        this.dateStart = dateStart;
-    }
-
-    public void setDateEnd(String dateEnd) {
-        this.dateEnd = dateEnd;
-    }
-
     public void setCustomerName(String name) {
         this.customerName = name;
     }
+
+    public String getDateStartDate() {
+        return dateStartDate;
+    }
+
+    public void setDateStartDate(String dateStartDate) {
+        this.dateStartDate = dateStartDate;
+    }
+
+    public String getDateStartTime() {
+        return dateStartTime;
+    }
+
+    public void setDateStartTime(String dateStartTime) {
+        this.dateStartTime = dateStartTime;
+    }
+
+    public String getDateEndDate() {
+        return dateEndDate;
+    }
+
+    public void setDateEndDate(String dateEndDate) {
+        this.dateEndDate = dateEndDate;
+    }
+
+    public String getDateEndTime() {
+        return dateEndTime;
+    }
+
+    public void setDateEndTime(String dateEndTime) {
+        this.dateEndTime = dateEndTime;
+    }
+
 
     public void setUserID(int userID) {
         this.userID = userID;

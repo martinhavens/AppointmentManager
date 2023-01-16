@@ -144,4 +144,27 @@ public class Customers {
         }
     }
 
+    public static void addCustomer(Integer ID, String name, String address, String phone, String postal, Integer division) throws SQLException {
+        String sql = String.format("INSERT INTO customers (Customer_ID, Customer_Name, Address, Postal_Code, Phone, Division_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%d');", ID, name, address, postal, phone, division);
+        PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+        int rowsAffected = ps.executeUpdate();
+    }
+
+    public static void addCustomer(Customer newCustomer) throws SQLException {
+        Integer ID = newCustomer.getCustomerID();
+        String name = newCustomer.getName();
+        String address = newCustomer.getAddress();
+        String phone = newCustomer.getPhoneNumber();
+        String postal = newCustomer.getPostalCode();
+        String division = newCustomer.getDivision();
+        String sql = String.format("INSERT INTO customers (Customer_ID, Customer_Name, Address, Postal_Code, Phone, Division_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%d');", ID, name, address, postal, phone, division);
+        PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+        int rowsAffected = ps.executeUpdate();
+    }
+
+    public static void updateCustomer(Customer oldCustomer, Customer newCustomer) throws SQLException {
+        Customers.deleteCustomer(oldCustomer);
+        Customers.addCustomer(newCustomer);
+
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.appointmentmanager;
 import DBAccess.Appointments;
 //import DBAccess.AppointmentsTime;
+import DBAccess.AppointmentsTime;
 import DBAccess.Contacts;
 import DBAccess.Customers;
 import Model.Appointment;
@@ -9,6 +10,7 @@ import Model.Customer;
 import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import helper.AlertBox;
 import helper.JDBC;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,9 +21,18 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.InputMethodEvent;
 
 import java.net.URL;
+import java.nio.file.FileSystems;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.chrono.ChronoLocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -45,6 +56,16 @@ public class AppointmentsController implements Initializable {
     public Button addCustomer;
     public Button deleteAppointment;
     public Button deleteCustomer;
+    public DatePicker endDatePick;
+    public DatePicker startDatePick;
+    public ComboBox startTimePick;
+    public ComboBox endTimePick;
+    public RadioButton monthlyFilter;
+    public RadioButton weeklyFilter;
+    public Button filterHigher;
+    public Button filterLower;
+    public ToggleGroup filterGroup;
+    public Label referenceFrame;
     Integer selectedIndex;
     ObservableList<Appointment> tempAppointments = Appointments.getAllAppointments();
     ObservableList<Customer> tempCustomers = Customers.getAllCustomers();
@@ -74,8 +95,6 @@ public class AppointmentsController implements Initializable {
     public TextField aLocation;
     public ComboBox<String> aContact;
     public TextField aType;
-    public TextField aStart;
-    public TextField aEnd;
     public TextField aCID;
     public TextField aUserID;
     public Label dynamicLabel;
@@ -91,8 +110,13 @@ public class AppointmentsController implements Initializable {
         aTLocation.setCellValueFactory(new PropertyValueFactory<>("location"));
         aTContactID.setCellValueFactory(new PropertyValueFactory<>("contactName"));
         aTType.setCellValueFactory(new PropertyValueFactory<>("type"));
-        aTStart.setCellValueFactory(new PropertyValueFactory<>("dateStart"));
-        aTEnd.setCellValueFactory(new PropertyValueFactory<>("dateEnd"));
+
+//        aTStart.setCellValueFactory(new PropertyValueFactory<>("dateStartDate"));
+//        aTStart.setCellValueFactory(cellData -> cellData.getValue().getDateStartDate().concat(" ").concat(cellData.getValue().getDateStartTime()));
+        aTStart.setCellValueFactory(cellData -> Bindings.createStringBinding(() -> cellData.getValue().getDateStartDate() + " " + cellData.getValue().getDateStartTime()));
+        aTEnd.setCellValueFactory(cellData -> Bindings.createStringBinding(() -> cellData.getValue().getDateEndDate() + " " + cellData.getValue().getDateEndTime()));
+//        aTEnd.setCellValueFactory(new PropertyValueFactory<>("dateEndDate"));
+
         aTCID.setCellValueFactory(new PropertyValueFactory<>("customerID"));
         atUID.setCellValueFactory(new PropertyValueFactory<>("userID"));
         cTID.setCellValueFactory(new PropertyValueFactory<>("customerID"));
@@ -112,7 +136,6 @@ public class AppointmentsController implements Initializable {
         customerDisable();
         modifyCustomer.setDisable(true);
         deleteCustomer.setDisable(true);
-
 
         cTableView.getSelectionModel().selectedIndexProperty().addListener((obs, oldV, newV) -> {
             if (newV != null){
@@ -137,6 +160,9 @@ public class AppointmentsController implements Initializable {
                 deleteAppointment.setDisable(true);
             }
         });
+        filterLower.setDisable(true);
+        filterHigher.setDisable(true);
+
     }
     public void modifyCustomer(ActionEvent actionEvent) throws SQLException {
         if (cTableView.getSelectionModel().isEmpty()){
@@ -189,6 +215,13 @@ public class AppointmentsController implements Initializable {
         cDivision.setDisable(true);
         saveCustomer.setDisable(true);
         cancelCustomer.setDisable(true);
+        cName.setText("");
+        cCID.setText("");
+        cAddress.setText("");
+        cPhone.setText("");
+        cPostal.setText("");
+        cCountry.setItems(null);
+        cDivision.setItems(null);
     }
     public void addCustomer(ActionEvent actionEvent) throws SQLException {
         customerDisable();
@@ -229,8 +262,145 @@ public class AppointmentsController implements Initializable {
         modifyCustomer.setDisable(true);
         deleteCustomer.setDisable(true);
     }
-    public void createCustomer(ActionEvent actionEvent) {
+    public void createCustomer(ActionEvent actionEvent) throws SQLException {
+        int a_id_c = 0;
+        Integer ID;
+        String name;
 
+        String address;
+        String phone;
+        String postal;
+        String country;
+        String division;
+
+        int customerID;
+        int userID;
+        if (Objects.equals(dynamicLabel.getText(), "Modifying Customer:")) {
+            if (Customers.getAllCustomers().size() == 0) {
+                a_id_c = 1;
+            } else {
+                Customer id_ce = cTableView.getItems().get(selectedIndex);
+                a_id_c = id_ce.getCustomerID();
+            }
+        } else if (dynamicLabel.getText().equals("Adding a Customer:")) {
+            int N = Customers.getAllCustomers().size();
+            if (N == 0) {
+                a_id_c = 1;
+            } else {
+                int[] arr = new int[N + 1];
+                for (int i = 0; i < N; i++) {
+                    Customer tempPart = tempCustomers.get(i);
+                    arr[i] = tempPart.getCustomerID();
+                }
+                int j;
+                int[] temp2 = new int[N + 1];
+                for (j = 0; j <= N; j++) {
+                    temp2[j] = 0;
+                }
+                for (j = 0; j < N; j++) {
+                    temp2[arr[j] - 1] = 1;
+                }
+                int ans = 0;
+                for (j = 0; j <= N; j++) {
+                    if (temp2[j] == 0)
+                        ans = j + 1;
+                }
+                a_id_c = ans;
+            }
+        }
+
+        if (cName.getText().isEmpty()) {
+            AlertBox.display("Error Message", "Name is empty!");
+            return;
+        }
+        if (cAddress.getText().isEmpty()) {
+            AlertBox.display("Error Message", "Address is empty!");
+            return;
+        }
+        if (cPhone.getText().isEmpty()) {
+            AlertBox.display("Error Message", "Phone Number is empty!");
+            return;
+        }
+
+        if (cPostal.getText().isEmpty()){
+            AlertBox.display("Error Message", "Postal Code is empty!");
+            return;
+        }
+        if (cCountry.getValue() == null){
+            AlertBox.display("Error Message", "Country is not selected!");
+            return;
+        }
+        if (cDivision.getValue() == null){
+            AlertBox.display("Error Message", "Division is not selected!");
+            return;
+        }
+        try {
+            ID = Integer.parseInt(cCID.getText());
+        } catch (NumberFormatException nfe) {
+            AlertBox.display("Error Message", "Customer ID is Invalid!");
+            return;
+        }
+        try {
+            name = cName.getText();
+        } catch (NumberFormatException nfe) {
+            AlertBox.display("Error Message", "Name is Invalid!");
+            return;
+        }
+        try {
+            address = cAddress.getText();
+        } catch (NumberFormatException nfe) {
+            AlertBox.display("Error Message", "Address is Invalid!");
+            return;
+        }
+        try {
+            phone = cPhone.getText();
+        } catch (NumberFormatException nfe) {
+            AlertBox.display("Error Message", "Phone is Invalid!");
+            return;
+        }
+        try {
+            country = (String)cCountry.getSelectionModel().getSelectedItem();
+        } catch (NumberFormatException nfe) {
+            AlertBox.display("Error Message", "Country is Invalid!");
+            return;
+        }
+        try {
+            division = (String)cDivision.getSelectionModel().getSelectedItem();
+        } catch (NumberFormatException nfe) {
+            AlertBox.display("Error Message", "Division is Invalid!");
+            return;
+        }
+        try {
+            postal = cPostal.getText();
+        } catch (NumberFormatException nfe) {
+            AlertBox.display("Error Message", "Postal Code is Invalid!");
+            return;
+        }
+
+        Customer c = null;
+        if (dynamicLabel.getText().equals("Adding a Customer:")){
+            try {
+                c = new Customer(ID, name, address, phone, postal, Customers.divisionsMap.get(division));
+                Customers.addCustomer(ID, name, address, phone, postal, Customers.divisionsMap.get(division));
+            } catch (Exception e) {
+                Customers.deleteCustomer(c);
+                e.printStackTrace();
+                return;
+            }
+        }
+        else if (dynamicLabel.getText().equals("Modifying Customer:")){
+            try {
+                c = new Customer(ID, name, address, phone, postal, Customers.divisionsMap.get(division));
+                Customers.updateCustomer(cTableView.getItems().get(selectedIndex), c);
+            } catch (Exception e) {
+                Customers.deleteCustomer(c);
+                e.printStackTrace();
+                return;
+            }
+        }
+        cTableView.setItems(Customers.getAllCustomers());
+        tempCustomers = Customers.getAllCustomers();
+        customerDisable();
 
     }
     public void cancelCustomer(ActionEvent actionEvent) throws SQLException {
@@ -310,12 +480,16 @@ public class AppointmentsController implements Initializable {
         aAID.setText((String.valueOf(tempA.getAppointmentID())));
         aDescription.setText(String.valueOf(tempA.getDescription()));
         aLocation.setText(String.valueOf(tempA.getLocation()));
-        aStart.setText(String.valueOf(tempA.getDateStart()));
-        aEnd.setText(String.valueOf(tempA.getDateEnd()));
+        startDatePick.setValue(LocalDate.parse(tempA.getDateStartDate()));
+        startTimePick.setValue(tempA.getDateStartTime());
+        endTimePick.setValue(tempA.getDateEndTime());
+        endDatePick.setValue(LocalDate.parse(tempA.getDateEndDate()));
         aCID.setText(String.valueOf(tempA.getCustomerID()));
         aUserID.setText(String.valueOf(tempA.getUserID()));
         aType.setText(String.valueOf(tempA.getType()));
         aContact.setItems(Contacts.getAllContactNames());
+        startTimePick.setItems(AppointmentsTime.timeOptions());
+        endTimePick.setItems(AppointmentsTime.timeOptions());
         aContact.getSelectionModel().select(Contacts.contactDictionary.get(tempA.getContactID()));
         addAppointment.setDisable(true);
         deleteAppointment.setDisable(true);
@@ -328,11 +502,13 @@ public class AppointmentsController implements Initializable {
 //        aAID.setDisable(false);
         aDescription.setDisable(false);
         aLocation.setDisable(false);
-        aStart.setDisable(false);
-        aEnd.setDisable(false);
         aCID.setDisable(false);
         aUserID.setDisable(false);
         aContact.setDisable(false);
+        startTimePick.setDisable(false);
+        endTimePick.setDisable(false);
+        startDatePick.setDisable(false);
+        endDatePick.setDisable(false);
         aType.setDisable(false);
         saveAppointment.setDisable(false);
         cancelAppointment.setDisable(false);
@@ -345,21 +521,25 @@ public class AppointmentsController implements Initializable {
         aAID.setText("");
         aDescription.setText("");
         aLocation.setText("");
-        aStart.setText("");
-        aEnd.setText("");
         aCID.setText("");
         aUserID.setText("");
         aContact.setItems(null);
+        startTimePick.setItems(null);
+        endTimePick.setItems(null);
         aType.setText("");
         aTitle.setDisable(true);
         aAID.setDisable(true);
         aDescription.setDisable(true);
         aLocation.setDisable(true);
-        aStart.setDisable(true);
-        aEnd.setDisable(true);
         aCID.setDisable(true);
         aUserID.setDisable(true);
         aContact.setDisable(true);
+        startTimePick.setDisable(true);
+        endTimePick.setDisable(true);
+        startDatePick.setValue(null);
+        endDatePick.setValue(null);
+        startDatePick.setDisable(true);
+        endDatePick.setDisable(true);
         aContact.setItems(null);
         aType.setDisable(true);
         saveAppointment.setDisable(true);
@@ -402,6 +582,8 @@ public class AppointmentsController implements Initializable {
         }
         dynamicLabel.setText("Adding an Appointment:");
         aContact.setItems(Contacts.getAllContactNames());
+        startTimePick.setItems(AppointmentsTime.timeOptions());
+        endTimePick.setItems(AppointmentsTime.timeOptions());
         aTableView.getSelectionModel().clearSelection();
         modifyAppointment.setDisable(true);
         deleteAppointment.setDisable(true);
@@ -415,7 +597,14 @@ public class AppointmentsController implements Initializable {
         int contactID;
         String type;
         String dateStart;
+        ZonedDateTime dateSZ;
         String dateEnd;
+        ZonedDateTime dateEZ;
+        String dateStartDate;
+        String dateStartTime;
+        String dateEndDate;
+        String dateEndTime;
+
         int customerID;
         int userID;
         if (Objects.equals(dynamicLabel.getText(), "Modifying Appointment:")) {
@@ -464,14 +653,17 @@ public class AppointmentsController implements Initializable {
             AlertBox.display("Error Message", "Location is empty!");
             return;
         }
-        if (aStart.getText().isEmpty()) {
-            AlertBox.display("Error Message", "Start is empty!");
+
+
+        if (startDatePick.getValue() == null){
+            AlertBox.display("Error Message", "Date Start is empty!");
             return;
         }
-        if (aEnd.getText().isEmpty()) {
-            AlertBox.display("Error Message", "End is empty!");
+        if (endDatePick.getValue() == null){
+            AlertBox.display("Error Message", "Date End is empty!");
             return;
         }
+
         if (aCID.getText().isEmpty()) {
             AlertBox.display("Error Message", "Customer ID is empty!");
             return;
@@ -524,24 +716,13 @@ public class AppointmentsController implements Initializable {
             AlertBox.display("Error Message", "Type is Invalid!");
             return;
         }
-        try {
-            dateStart = aStart.getText();
-//            if (AppointmentsTime.checkDate(dateStart) == true){
-//                System.out.println("true");
-//            } else {
-//                AlertBox.display("Error Message", "Start is Invalid!");
-//                return;
-//            }
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Start is Invalid!");
-            return;
-        }
-        try {
-            dateEnd = aEnd.getText();
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "End is Invalid!");
-            return;
-        }
+
+        dateStartDate = startDatePick.getValue().toString();
+        dateStartTime = (String) startTimePick.getValue();
+        dateEndDate = endDatePick.getValue().toString();
+        dateEndTime = (String) endTimePick.getValue();
+
+
         try {
             customerID = Integer.parseInt(aCID.getText());
         } catch (NumberFormatException nfe) {
@@ -558,7 +739,9 @@ public class AppointmentsController implements Initializable {
         Appointment c = null;
         if (dynamicLabel.getText().equals("Adding an Appointment:")){
             try {
-                c = new Appointment(ID, title, description, location, contactID, type, dateStart, dateEnd, customerID, userID);
+                c = new Appointment(ID, title, description, location, contactID, type, dateStartDate, dateStartTime, dateEndDate, dateEndTime, customerID, userID);
+                dateStart = dateStartDate + " " + dateStartTime;
+                dateEnd = dateEndDate + " " + dateEndTime;
                 Appointments.addAppointment(ID, title, description, location, contactID, type, dateStart, dateEnd, customerID, userID);
             } catch (MysqlDataTruncation e) {
                 AlertBox.display("Error Message", "The date must be in the format of 'YYYY-MM-DD HH:MN:SS'. 0 <= YYYY < 10000, 0 < MM < 13, 00 < DD < 31, 00 <= HH < 25, 00 <= MN < 60, 00 <= SS < 60.");
@@ -568,11 +751,12 @@ public class AppointmentsController implements Initializable {
         }
         else if (dynamicLabel.getText().equals("Modifying Appointment:")){
             try {
-                c = new Appointment(ID, title, description, location, contactID, type, dateStart, dateEnd, customerID, userID);
+                c = new Appointment(ID, title, description, location, contactID, type, dateStartDate, dateStartTime, dateEndDate, dateEndTime, customerID, userID);
                 Appointments.updateAppointment(aTableView.getItems().get(selectedIndex), c);
             } catch (MysqlDataTruncation e) {
                 AlertBox.display("Error Message", "The date must be in the format of 'YYYY-MM-DD HH:MN:SS'. 0 <= YYYY < 10000, 0 < MM < 13, 00 < DD < 31, 00 <= HH < 25, 00 <= MN < 60, 00 <= SS < 60.");
                 Appointments.deleteAppointment(c);
+                e.printStackTrace();
                 return;
             }
         }
@@ -602,8 +786,142 @@ public class AppointmentsController implements Initializable {
             tempAppointments = Appointments.getAllAppointments();
     }
 
+    public void appointmentsMonthly(ActionEvent actionEvent) throws SQLException {
+        filterLower.setDisable(false);
+        filterHigher.setDisable(false);
+        tempAppointments = Appointments.getAllAppointments();
+        String min = null;
+        int c = 0;
+        if (referenceFrame.getText().equals("All")){
+            for (Appointment a : tempAppointments){
+                if (min == null) {
+                    min = a.getDateStartDate();
+                } else {
+                    c = a.getDateStartDate().compareTo(min);
+                }
+                if (c < 0){
+                    min = a.getDateStartDate();
+                } else {
+                    continue;
+                }
+            }
+        } else {
+            min = referenceFrame.getText();
+        }
 
-    public void cSelectionClear(InputMethodEvent mouseEvent) {
-        cTableView.getSelectionModel().clearSelection();
+        ObservableList tempItems = FXCollections.observableArrayList();
+        for (Appointment a : tempAppointments){
+            if (0 == a.getDateStartDate().split("-", 3)[1].compareTo(min.split("-", 3)[1]) && 0 == a.getDateStartDate().split("-", 3)[0].compareTo(min.split("-", 3)[0])){
+                tempItems.add(a);
+            }
+        }
+        aTableView.setItems(tempItems);
+        referenceFrame.setText(min);
+        filterLower.setOnAction(e -> filterLowerMonth());
+        filterHigher.setOnAction(e -> filterHigherMonth());
     }
+
+    public void appointmentsWeekly(ActionEvent actionEvent) throws SQLException {
+        filterLower.setDisable(false);
+        filterHigher.setDisable(false);
+        tempAppointments = Appointments.getAllAppointments();
+        String min = null;
+        int c = 0;
+        if (referenceFrame.getText().equals("All")) {
+            for (Appointment a : tempAppointments) {
+                if (min == null) {
+                    min = a.getDateStartDate();
+                } else {
+                    c = a.getDateStartDate().compareTo(min);
+                }
+                if (c < 0) {
+                    min = a.getDateStartDate();
+                } else {
+                    continue;
+                }
+            }
+        } else {
+            min = referenceFrame.getText();
+        }
+        ObservableList tempItems = FXCollections.observableArrayList();
+        for (Appointment a : tempAppointments){
+            if (0 == a.getDateStartDate().split("-", 3)[1].compareTo(min.split("-", 3)[1]) && 0 == a.getDateStartDate().split("-", 3)[0].compareTo(min.split("-", 3)[0]) && (LocalDate.parse(a.getDateStartDate()).isBefore(LocalDate.parse(min).plusDays(7))) && LocalDate.parse(a.getDateStartDate()).isAfter(LocalDate.parse(min).plusDays(-1))  ){
+                tempItems.add(a);
+            }
+        }
+        aTableView.setItems(tempItems);
+        referenceFrame.setText(min);
+        filterLower.setOnAction(e -> filterLowerWeek());
+        filterHigher.setOnAction(e -> filterHigherWeek());
+    }
+
+    public static LocalDate mini;
+
+    public void filterHigherMonth() {
+        referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusMonths(1)));
+        ObservableList tempItems = FXCollections.observableArrayList();
+        for (Appointment a : tempAppointments){
+            if ( LocalDate.parse(a.getDateStartDate()).isEqual(LocalDate.parse(referenceFrame.getText())) || (LocalDate.parse(a.getDateStartDate()).isBefore(LocalDate.parse(referenceFrame.getText()).plusMonths(1)) && LocalDate.parse(a.getDateStartDate()).isAfter(LocalDate.parse(referenceFrame.getText())))){
+                tempItems.add(a);
+            }
+        }
+        if (tempItems.size() == 0){
+            aTableView.setItems(null);
+        } else {
+            aTableView.setItems(tempItems);
+        }
+    }
+
+    public void filterLowerMonth() {
+        referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusMonths(-1)));
+        ObservableList tempItems = FXCollections.observableArrayList();
+        for (Appointment a : tempAppointments){
+            if ( LocalDate.parse(a.getDateStartDate()).isEqual(LocalDate.parse(referenceFrame.getText())) || (LocalDate.parse(a.getDateStartDate()).isBefore(LocalDate.parse(referenceFrame.getText())) && LocalDate.parse(a.getDateStartDate()).isAfter(LocalDate.parse(referenceFrame.getText()).plusMonths(1)))){
+                tempItems.add(a);
+            }
+        }
+        if (tempItems.size() == 0){
+            aTableView.setItems(null);
+        } else {
+            aTableView.setItems(tempItems);
+        }
+    }
+    public void filterHigherWeek() {
+        referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusDays(7)));
+        ObservableList tempItems = FXCollections.observableArrayList();
+        for (Appointment a : tempAppointments){
+            if ( LocalDate.parse(a.getDateStartDate()).isEqual(LocalDate.parse(referenceFrame.getText())) || (LocalDate.parse(a.getDateStartDate()).isBefore(LocalDate.parse(referenceFrame.getText()).plusDays(7)) && LocalDate.parse(a.getDateStartDate()).isAfter(LocalDate.parse(referenceFrame.getText())))){
+                tempItems.add(a);
+            }
+        }
+        if (tempItems.size() == 0){
+            aTableView.setItems(null);
+        } else {
+            aTableView.setItems(tempItems);
+        }
+    }
+    public void filterLowerWeek() {
+        referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusDays(-7)));
+        ObservableList tempItems = FXCollections.observableArrayList();
+        for (Appointment a : tempAppointments){
+            if ( LocalDate.parse(a.getDateStartDate()).isEqual(LocalDate.parse(referenceFrame.getText())) || (LocalDate.parse(a.getDateStartDate()).isAfter(LocalDate.parse(referenceFrame.getText())) && LocalDate.parse(a.getDateStartDate()).isBefore(LocalDate.parse(referenceFrame.getText()).plusDays(7)))){
+                tempItems.add(a);
+            }
+        }
+        if (tempItems.size() == 0){
+            aTableView.setItems(null);
+        } else {
+            aTableView.setItems(tempItems);
+        }
+    }
+
+    public void clearFilter(ActionEvent actionEvent) {
+        weeklyFilter.setSelected(false);
+        monthlyFilter.setSelected(false);
+        aTableView.setItems(tempAppointments);
+        referenceFrame.setText("All");
+        filterLower.setDisable(true);
+        filterHigher.setDisable(true);
+    }
+
 }
