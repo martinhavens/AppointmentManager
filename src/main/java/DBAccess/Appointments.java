@@ -8,8 +8,11 @@ import javafx.collections.ObservableList;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+
+import static java.time.ZoneOffset.UTC;
 
 public class Appointments {
 
@@ -33,18 +36,12 @@ public class Appointments {
                 int contactID = rs.getInt("Contact_ID");
                 String type = rs.getString("Type");
 
-                String dateStarte = rs.getString("Start");
-                String dateSplit[] = dateStarte.split(" ", 2);
-                String dateStartDate = dateSplit[0];
-                String dateStartTime = dateSplit[1];
-                String dateEnd = rs.getString("End");
-                dateSplit = dateEnd.split(" ", 2);
-                String dateEndDate = dateSplit[0];
-                String dateEndTime = dateSplit[1];
+                LocalDateTime dateStart = rs.getTimestamp("Start").toLocalDateTime();
+                LocalDateTime dateEnd = rs.getTimestamp("End").toLocalDateTime();
 
                 int customerID = rs.getInt("Customer_ID");
                 int userID = rs.getInt("User_ID");
-                Appointment c = new Appointment(app_id, title, desc, location, contactID, type, dateStartDate, dateStartTime, dateEndDate, dateEndTime, customerID, userID);
+                Appointment c = new Appointment(app_id, title, desc, location, contactID, type, dateStart, dateEnd, customerID, userID);
                 allAppointments.add(c);
                 alist.add(c);
             }
@@ -75,9 +72,11 @@ public class Appointments {
         return(sql);
     }
 
-    public static void addAppointment(Integer ID, String title, String description, String location, int contactID, String type, String dateStart, String dateEnd, int customerID, int userID) throws SQLException {
-        String sql = String.format("INSERT INTO appointments (Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, Contact_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d);", ID, title, description, location, type, dateStart, dateEnd, customerID, userID, contactID);
+    public static void addAppointment(Integer ID, String title, String description, String location, int contactID, String type, LocalDateTime dateStart, LocalDateTime dateEnd, int customerID, int userID) throws SQLException { //, dateStart.atZone(ZoneId.ofOffset("UTC", UTC)), dateEnd.atZone(ZoneId.ofOffset("UTC", UTC))
+        String sql = String.format("INSERT INTO appointments (Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, Contact_ID) VALUES (%d, '%s', '%s', '%s', '%s', ?, ?, %d, %d, %d);", ID, title, description, location, type, customerID, userID, contactID);
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+        ps.setTimestamp(1, Timestamp.valueOf(dateStart));
+        ps.setTimestamp(2, Timestamp.valueOf(dateEnd));
         int rowsAffected = ps.executeUpdate();
     }
 
@@ -88,12 +87,16 @@ public class Appointments {
         String location = newAppointment.getLocation();
         int contactID = newAppointment.getContactID();
         String type = newAppointment.getType();
-        String dateSZ = newAppointment.getDateStartDate() +" " + newAppointment.getDateStartTime();
-        String dateEZ = newAppointment.getDateEndDate() + " " + newAppointment.getDateEndTime();
+
+        LocalDateTime dateStart = newAppointment.getDateStart();
+        LocalDateTime dateEnd = newAppointment.getDateEnd();
+
         int customerID = newAppointment.getCustomerID();
         int userID = newAppointment.getUserID();
-        String sql = String.format("INSERT INTO appointments (Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, Contact_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d);", ID, title, description, location, type, dateSZ, dateEZ, customerID, userID, contactID);
+        String sql = String.format("INSERT INTO appointments (Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, Contact_ID) VALUES (%d, '%s', '%s', '%s', '%s', ?, ?, %d, %d, %d);", ID, title, description, location, type, customerID, userID, contactID);
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+        ps.setTimestamp(1, Timestamp.valueOf(dateStart));
+        ps.setTimestamp(2, Timestamp.valueOf(dateEnd));
         int rowsAffected = ps.executeUpdate();
     }
 
