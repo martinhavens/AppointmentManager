@@ -162,7 +162,12 @@ public class AppointmentsController implements Initializable {
         });
         filterLower.setDisable(true);
         filterHigher.setDisable(true);
-
+        try {
+            Customers.getAllDivisions();
+            Customers.getAllCountries();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
     public void modifyCustomer(ActionEvent actionEvent) throws SQLException {
         if (cTableView.getSelectionModel().isEmpty()){
@@ -222,6 +227,9 @@ public class AppointmentsController implements Initializable {
         cPostal.setText("");
         cCountry.setItems(null);
         cDivision.setItems(null);
+        modifyCustomer.setDisable(true);
+        deleteCustomer.setDisable(true);
+        addCustomer.setDisable(false);
     }
     public void addCustomer(ActionEvent actionEvent) throws SQLException {
         customerDisable();
@@ -376,7 +384,6 @@ public class AppointmentsController implements Initializable {
             AlertBox.display("Error Message", "Postal Code is Invalid!");
             return;
         }
-
         Customer c = null;
         if (dynamicLabel.getText().equals("Adding a Customer:")){
             try {
@@ -388,11 +395,13 @@ public class AppointmentsController implements Initializable {
                 return;
             }
         }
+
         else if (dynamicLabel.getText().equals("Modifying Customer:")){
             try {
                 c = new Customer(ID, name, address, phone, postal, Customers.divisionsMap.get(division));
                 Customers.updateCustomer(cTableView.getItems().get(selectedIndex), c);
             } catch (Exception e) {
+                e.printStackTrace();
                 Customers.deleteCustomer(c);
                 e.printStackTrace();
                 return;

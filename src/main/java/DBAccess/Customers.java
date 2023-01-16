@@ -157,7 +157,7 @@ public class Customers {
         String phone = newCustomer.getPhoneNumber();
         String postal = newCustomer.getPostalCode();
         String division = newCustomer.getDivision();
-        String sql = String.format("INSERT INTO customers (Customer_ID, Customer_Name, Address, Postal_Code, Phone, Division_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%d');", ID, name, address, postal, phone, division);
+        String sql = String.format("INSERT INTO customers (Customer_ID, Customer_Name, Address, Postal_Code, Phone, Division_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%d');", ID, name, address, postal, phone, Customers.divisionsMap.get(division));
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         int rowsAffected = ps.executeUpdate();
     }
@@ -165,6 +165,5 @@ public class Customers {
     public static void updateCustomer(Customer oldCustomer, Customer newCustomer) throws SQLException {
         Customers.deleteCustomer(oldCustomer);
         Customers.addCustomer(newCustomer);
-
     }
 }
