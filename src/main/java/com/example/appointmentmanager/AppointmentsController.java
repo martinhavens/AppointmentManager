@@ -277,10 +277,8 @@ public class AppointmentsController implements Initializable {
         deleteCustomer.setDisable(true);
     }
     public void createCustomer(ActionEvent actionEvent) throws SQLException {
-        int a_id_c = 0;
         Integer ID;
         String name;
-
         String address;
         String phone;
         String postal;
@@ -289,39 +287,6 @@ public class AppointmentsController implements Initializable {
 
         int customerID;
         int userID;
-        if (Objects.equals(dynamicLabel.getText(), "Modifying Customer:")) {
-            if (Customers.getAllCustomers().size() == 0) {
-                a_id_c = 1;
-            } else {
-                Customer id_ce = cTableView.getItems().get(selectedIndex);
-                a_id_c = id_ce.getCustomerID();
-            }
-        } else if (dynamicLabel.getText().equals("Adding a Customer:")) {
-            int N = Customers.getAllCustomers().size();
-            if (N == 0) {
-                a_id_c = 1;
-            } else {
-                int[] arr = new int[N + 1];
-                for (int i = 0; i < N; i++) {
-                    Customer tempPart = tempCustomers.get(i);
-                    arr[i] = tempPart.getCustomerID();
-                }
-                int j;
-                int[] temp2 = new int[N + 1];
-                for (j = 0; j <= N; j++) {
-                    temp2[j] = 0;
-                }
-                for (j = 0; j < N; j++) {
-                    temp2[arr[j] - 1] = 1;
-                }
-                int ans = 0;
-                for (j = 0; j <= N; j++) {
-                    if (temp2[j] == 0)
-                        ans = j + 1;
-                }
-                a_id_c = ans;
-            }
-        }
 
         if (cName.getText().isEmpty()) {
             AlertBox.display("Error Message", "Name is empty!");
@@ -605,7 +570,6 @@ public class AppointmentsController implements Initializable {
         deleteAppointment.setDisable(true);
     }
     public void createAppointment(ActionEvent actionEvent) throws SQLException {
-        int a_id_c = 0;
         Integer ID;
         String title;
         String description;
@@ -617,39 +581,6 @@ public class AppointmentsController implements Initializable {
 
         int customerID;
         int userID;
-        if (Objects.equals(dynamicLabel.getText(), "Modifying Appointment:")) {
-            if (Appointments.getAllAppointments().size() == 0) {
-                a_id_c = 1;
-            } else {
-                Appointment id_ce = aTableView.getItems().get(selectedIndex);
-                a_id_c = id_ce.getAppointmentID();
-            }
-        } else if (dynamicLabel.getText().equals("Adding an Appointment:")) {
-            int N = Appointments.getAllAppointments().size();
-            if (N == 0) {
-                a_id_c = 1;
-            } else {
-                int[] arr = new int[N + 1];
-                for (int i = 0; i < N; i++) {
-                    Appointment tempPart = tempAppointments.get(i);
-                    arr[i] = tempPart.getAppointmentID();
-                }
-                int j;
-                int[] temp2 = new int[N + 1];
-                for (j = 0; j <= N; j++) {
-                    temp2[j] = 0;
-                }
-                for (j = 0; j < N; j++) {
-                    temp2[arr[j] - 1] = 1;
-                }
-                int ans = 0;
-                for (j = 0; j <= N; j++) {
-                    if (temp2[j] == 0)
-                        ans = j + 1;
-                }
-                a_id_c = ans;
-            }
-        }
 
         if (aTitle.getText().isEmpty()) {
             AlertBox.display("Error Message", "Title is empty!");
@@ -663,8 +594,6 @@ public class AppointmentsController implements Initializable {
             AlertBox.display("Error Message", "Location is empty!");
             return;
         }
-
-
         if (startDatePick.getValue() == null){
             AlertBox.display("Error Message", "Date Start is empty!");
             return;
@@ -726,11 +655,19 @@ public class AppointmentsController implements Initializable {
             AlertBox.display("Error Message", "Type is Invalid!");
             return;
         }
-        System.out.println(startDatePick.getValue());
-        System.out.println(startTimePick.getValue());
-//        LocalDateTime newStart = LocalDateTime.of(startDatePick.getValue(), startTimePick.getValue());
+
+
         dateStart = LocalDateTime.of(startDatePick.getValue(), LocalTime.parse(startTimePick.getValue().toString()));
         dateEnd = LocalDateTime.of(endDatePick.getValue(), LocalTime.parse(endTimePick.getValue().toString()));
+        if (dateStart.getDayOfWeek() == java.time.DayOfWeek.of(6) || dateStart.getDayOfWeek() == java.time.DayOfWeek.of(7)){
+            AlertBox.display("Error Message", "The office does not accept weekend appointments!");
+            return;
+        }
+        if (dateEnd.getDayOfWeek() == java.time.DayOfWeek.of(6) || dateEnd.getDayOfWeek() == java.time.DayOfWeek.of(7)){
+            AlertBox.display("Error Message", "The office does not accept weekend appointments!");
+            return;
+        }
+//        if (dateStart.toLocalTime())
 
         try {
             customerID = Integer.parseInt(aCID.getText());
@@ -794,6 +731,8 @@ public class AppointmentsController implements Initializable {
     }
 
     public void appointmentsMonthly(ActionEvent actionEvent) throws SQLException {
+        customerDisable();
+        appointmentDisable();
         filterLower.setDisable(false);
         filterHigher.setDisable(false);
         tempAppointments = Appointments.getAllAppointments();
@@ -825,6 +764,8 @@ public class AppointmentsController implements Initializable {
     }
 
     public void appointmentsWeekly(ActionEvent actionEvent) throws SQLException {
+        customerDisable();
+        appointmentDisable();
         filterLower.setDisable(false);
         filterHigher.setDisable(false);
         tempAppointments = Appointments.getAllAppointments();
