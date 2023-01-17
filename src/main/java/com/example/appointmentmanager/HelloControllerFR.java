@@ -6,7 +6,6 @@ import helper.AlertBox;
 import helper.JDBC;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -21,7 +20,7 @@ import java.sql.SQLException;
 
 import static com.example.appointmentmanager.HelloApplication.window;
 
-public class HelloController {
+public class HelloControllerFR {
 
     public TextField usernameTextField;
     public TextField passwordTextField;

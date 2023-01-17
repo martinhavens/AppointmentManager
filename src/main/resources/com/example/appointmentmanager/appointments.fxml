@@ -100,5 +100,5 @@
    <Button fx:id="filterLower" layoutX="343.0" layoutY="635.0" mnemonicParsing="false" text="&lt;" />
    <Button layoutX="421.0" layoutY="696.0" mnemonicParsing="false" onAction="#clearFilter" text="Clear" />
    <Label layoutX="337.0" layoutY="670.0" text="Frame of Reference:" />
-   <Label fx:id="referenceFrame" layoutX="450.0" layoutY="670.0" prefHeight="17.0" prefWidth="66.0" text="All" />
+   <Label fx:id="referenceFrame" layoutX="450.0" layoutY="670.0" prefHeight="18.0" prefWidth="150.0" text="All" />
 </AnchorPane>

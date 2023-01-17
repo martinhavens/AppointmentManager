@@ -30,10 +30,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -67,6 +69,8 @@ public class AppointmentsController implements Initializable {
     public Button filterLower;
     public ToggleGroup filterGroup;
     public Label referenceFrame;
+    public String clientTimeZone = Calendar.getInstance().getTimeZone().getDisplayName(); // Eastern Standard Time
+
     Integer selectedIndex;
     ObservableList<Appointment> tempAppointments = Appointments.getAllAppointments();
     ObservableList<Customer> tempCustomers = Customers.getAllCustomers();
@@ -720,9 +724,11 @@ public class AppointmentsController implements Initializable {
             AlertBox.display("Error Message", "Type is Invalid!");
             return;
         }
-
-        dateStart = LocalDateTime.parse(startDatePick + " " + startTimePick);
-        dateEnd = LocalDateTime.parse(endDatePick + " " + endTimePick);
+        System.out.println(startDatePick.getValue());
+        System.out.println(startTimePick.getValue());
+//        LocalDateTime newStart = LocalDateTime.of(startDatePick.getValue(), startTimePick.getValue());
+        dateStart = LocalDateTime.of(startDatePick.getValue(), LocalTime.parse(startTimePick.getValue().toString()));
+        dateEnd = LocalDateTime.of(endDatePick.getValue(), LocalTime.parse(endTimePick.getValue().toString()));
 
         try {
             customerID = Integer.parseInt(aCID.getText());
@@ -798,12 +804,10 @@ public class AppointmentsController implements Initializable {
                 }
                 if (a.getDateStart().isBefore(min)){
                     min = a.getDateStart();
-                } else {
-                    continue;
-                }
+                } else { }
             }
         } else {
-            min = LocalDateTime.parse(referenceFrame.getText());
+            min = LocalDate.parse(referenceFrame.getText()).atStartOfDay();
         }
 
         ObservableList tempItems = FXCollections.observableArrayList();
@@ -813,7 +817,7 @@ public class AppointmentsController implements Initializable {
             }
         }
         aTableView.setItems(tempItems);
-        referenceFrame.setText(String.valueOf(min));
+        referenceFrame.setText(String.valueOf(min.toLocalDate()));
         filterLower.setOnAction(e -> filterLowerMonth());
         filterHigher.setOnAction(e -> filterHigherMonth());
     }
@@ -833,12 +837,10 @@ public class AppointmentsController implements Initializable {
                 }
                 if (c < 0) {
                     min = a.getDateStart();
-                } else {
-                    continue;
-                }
+                } else { }
             }
         } else {
-            min = LocalDateTime.parse(referenceFrame.getText());
+            min = LocalDate.parse(referenceFrame.getText()).atStartOfDay();
         }
         ObservableList tempItems = FXCollections.observableArrayList();
         for (Appointment a : tempAppointments){
@@ -847,7 +849,7 @@ public class AppointmentsController implements Initializable {
             }
         }
         aTableView.setItems(tempItems);
-        referenceFrame.setText(String.valueOf(min));
+        referenceFrame.setText(String.valueOf(min.toLocalDate()));
         filterLower.setOnAction(e -> filterLowerWeek());
         filterHigher.setOnAction(e -> filterHigherWeek());
     }
@@ -858,7 +860,7 @@ public class AppointmentsController implements Initializable {
         referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusMonths(1)));
         ObservableList tempItems = FXCollections.observableArrayList();
         for (Appointment a : tempAppointments){
-            if ( a.getDateStart().isEqual(LocalDateTime.parse(referenceFrame.getText()))  || a.getDateStart().isBefore(LocalDateTime.parse(referenceFrame.getText()).plusMonths(1)) && a.getDateStart().isAfter(LocalDateTime.parse(referenceFrame.getText()))){
+            if ( a.getDateStart().isEqual(LocalDate.parse(referenceFrame.getText()).atStartOfDay())  || (a.getDateStart().isBefore(LocalDate.parse(referenceFrame.getText()).plusMonths(1).atStartOfDay()) && a.getDateStart().isAfter(LocalDate.parse(referenceFrame.getText()).atStartOfDay()))){
                 tempItems.add(a);
             }
         }
@@ -873,7 +875,7 @@ public class AppointmentsController implements Initializable {
         referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusMonths(-1)));
         ObservableList tempItems = FXCollections.observableArrayList();
         for (Appointment a : tempAppointments){
-            if ( a.getDateStart().isEqual(LocalDateTime.parse(referenceFrame.getText())) || (a.getDateStart().isBefore(LocalDateTime.parse(referenceFrame.getText())) && a.getDateStart().isAfter(LocalDateTime.parse(referenceFrame.getText()).plusMonths(1)))){
+            if ( a.getDateStart().isEqual(LocalDate.parse(referenceFrame.getText()).atStartOfDay()) || (a.getDateStart().isBefore(LocalDate.parse(referenceFrame.getText()).plusMonths(1).atStartOfDay()) && a.getDateStart().isAfter(LocalDate.parse(referenceFrame.getText()).atStartOfDay()))){
                 tempItems.add(a);
             }
         }
@@ -887,7 +889,7 @@ public class AppointmentsController implements Initializable {
         referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusDays(7)));
         ObservableList tempItems = FXCollections.observableArrayList();
         for (Appointment a : tempAppointments){
-            if ( a.getDateStart().isEqual(LocalDateTime.parse(referenceFrame.getText())) || (a.getDateStart().isBefore(LocalDateTime.parse(referenceFrame.getText()).plusDays(7)) && a.getDateStart().isAfter(LocalDateTime.parse(referenceFrame.getText())))){
+            if ( a.getDateStart().isEqual(LocalDate.parse(referenceFrame.getText()).atStartOfDay()) || (a.getDateStart().isBefore(LocalDate.parse(referenceFrame.getText()).plusDays(7).atStartOfDay()) && a.getDateStart().isAfter(LocalDate.parse(referenceFrame.getText()).atStartOfDay()))){
                 tempItems.add(a);
             }
         }
@@ -901,7 +903,7 @@ public class AppointmentsController implements Initializable {
         referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusDays(-7)));
         ObservableList tempItems = FXCollections.observableArrayList();
         for (Appointment a : tempAppointments){
-            if ( a.getDateStart().isEqual(LocalDateTime.parse(referenceFrame.getText())) || (a.getDateStart().isAfter(LocalDateTime.parse(referenceFrame.getText())) && a.getDateStart().isBefore(LocalDateTime.parse(referenceFrame.getText()).plusDays(7)))){
+            if ( a.getDateStart().isEqual(LocalDate.parse(referenceFrame.getText()).atStartOfDay()) || (a.getDateStart().isAfter(LocalDate.parse(referenceFrame.getText()).atStartOfDay()) && a.getDateStart().isBefore(LocalDate.parse(referenceFrame.getText()).plusDays(7).atStartOfDay()))){
                 tempItems.add(a);
             }
         }

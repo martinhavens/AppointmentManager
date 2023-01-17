@@ -2,6 +2,7 @@ package DBAccess;
 
 import Model.Appointment;
 import Model.Customer;
+import helper.AlertBox;
 import helper.JDBC;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,11 +21,15 @@ public class Customers {
     public static ObservableList<Customer> getAllCustomers() throws SQLException {
 
         ObservableList<Customer> alist = FXCollections.observableArrayList();
-
+        PreparedStatement ps;
         try {
             String sql = "SELECT * from customers";
-
-            PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+            try {
+                ps = JDBC.getConnection().prepareStatement(sql);
+            } catch (NullPointerException e) {
+                AlertBox.display("Error", "No connection to the database found!");
+                return null;
+            }
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()){
