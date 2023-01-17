@@ -29,6 +29,7 @@ public class HelloApplication extends Application {
         System.out.println(clientTimeZone);
 
         if (Locale.getDefault().getLanguage() == "en"){
+            System.out.println("ENglisHHHH");
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
             window = stage;
             Scene scene = new Scene(fxmlLoader.load(), 600, 400);
@@ -36,6 +37,7 @@ public class HelloApplication extends Application {
             window.setScene(scene);
             window.show();
         } else if (Locale.getDefault().getLanguage() == "fr"){
+            System.out.println("FRENchcCH");
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-viewFR.fxml"));
             window = stage;
             Scene scene = new Scene(fxmlLoader.load(), 600, 400);

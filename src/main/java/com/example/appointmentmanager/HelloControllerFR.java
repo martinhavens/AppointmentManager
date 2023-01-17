@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZoneId;
+import java.util.Calendar;
 
 import static com.example.appointmentmanager.HelloApplication.window;
 
@@ -30,23 +32,30 @@ public class HelloControllerFR {
     public AnchorPane anchorPane;
     //    Locale.setDefault(new Locale("fr"));
 
-    public void logIn(ActionEvent actionEvent) throws SQLException, IOException {
+    public void logInFR(ActionEvent actionEvent) throws SQLException, IOException {
         String sql = String.format("SELECT * FROM users WHERE User_Name = '%s';", usernameTextField.getText());
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         rs.next();
-        if (passwordTextField.getText().equals(rs.getString("Password"))){
-            openApts();
-        }
-        else {
-            AlertBox.display("Error", "Provided User/Password combination not found.");
+        try {
+            if (passwordTextField.getText().equals(rs.getString("Password"))) {
+                AppointmentsController.customerID = rs.getInt("User_ID");
+                System.out.println(AppointmentsController.customerID);
+                System.out.println(AppointmentsController.clientTimeZone);
+                System.out.println(Calendar.getInstance().getTimeZone().getRawOffset());
+                openApts();
+            } else {
+                AlertBox.display("Error", "La combinaison utilisateur/mot de passe fourni est introuvable.");
+            }
+        } catch (SQLException e) {
+            AlertBox.display("Error", "La combinaison utilisateur/mot de passe fourni est introuvable.");
         }
     }
 
     public void exitApp(ActionEvent actionEvent) {
         Stage stage;
         stage = (Stage) anchorPane.getScene().getWindow();
-        System.out.println("Program closed by user!");
+        System.out.println("Programme fermé par l'utilisateur !");
         stage.close();
     }
 

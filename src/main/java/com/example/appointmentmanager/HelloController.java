@@ -6,7 +6,6 @@ import helper.AlertBox;
 import helper.JDBC;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -31,17 +30,22 @@ public class HelloController {
     public AnchorPane anchorPane;
     //    Locale.setDefault(new Locale("fr"));
 
-    public void logIn(ActionEvent actionEvent) throws SQLException, IOException {
+    public void logInEN(ActionEvent actionEvent) throws SQLException, IOException {
         String sql = String.format("SELECT * FROM users WHERE User_Name = '%s';", usernameTextField.getText());
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         rs.next();
-        if (passwordTextField.getText().equals(rs.getString("Password"))){
-            openApts();
-        }
-        else {
+        try {
+            if (passwordTextField.getText().equals(rs.getString("Password"))) {
+                AppointmentsController.customerID = rs.getInt("User_ID");
+                openApts();
+            } else {
+                AlertBox.display("Error", "Provided User/Password combination not found..");
+            }
+        } catch (SQLException e) {
             AlertBox.display("Error", "Provided User/Password combination not found.");
         }
+
     }
 
     public void exitApp(ActionEvent actionEvent) {

@@ -69,7 +69,8 @@ public class AppointmentsController implements Initializable {
     public Button filterLower;
     public ToggleGroup filterGroup;
     public Label referenceFrame;
-    public String clientTimeZone = Calendar.getInstance().getTimeZone().getDisplayName(); // Eastern Standard Time
+    public static String clientTimeZone = Calendar.getInstance().getTimeZone().getDisplayName(); // Eastern Standard Time
+    public static Integer customerID;
 
     Integer selectedIndex;
     ObservableList<Appointment> tempAppointments = Appointments.getAllAppointments();
@@ -415,6 +416,7 @@ public class AppointmentsController implements Initializable {
         cTableView.setItems(Customers.getAllCustomers());
         tempCustomers = Customers.getAllCustomers();
         customerDisable();
+        dynamicLabel.setText("Select an Option:");
 
     }
     public void cancelCustomer(ActionEvent actionEvent) throws SQLException {
