@@ -28,10 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -69,8 +66,11 @@ public class AppointmentsController implements Initializable {
     public Button filterLower;
     public ToggleGroup filterGroup;
     public Label referenceFrame;
-    public static String clientTimeZone = Calendar.getInstance().getTimeZone().getDisplayName(); // Eastern Standard Time
+    public static ZoneId clientTimeZone = ZoneId.of(Calendar.getInstance().getTimeZone().getID()); // Eastern Standard Time
+    public static ZoneId clinicTimeZone = ZoneId.of("America/New_York"); // Eastern Standard Time
     public static Integer customerID;
+    public Label currentTimeZoneLabel;
+    public Label clinicTimeZoneLabel;
 
     Integer selectedIndex;
     ObservableList<Appointment> tempAppointments = Appointments.getAllAppointments();
@@ -174,6 +174,9 @@ public class AppointmentsController implements Initializable {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        currentTimeZoneLabel.setText(String.valueOf(clientTimeZone));
+        clinicTimeZoneLabel.setText(String.valueOf(clinicTimeZone));
     }
     public void modifyCustomer(ActionEvent actionEvent) throws SQLException {
         if (cTableView.getSelectionModel().isEmpty()){
@@ -436,18 +439,6 @@ public class AppointmentsController implements Initializable {
         cDivision.setItems(divisions);
     }
 
-
-
-    public void printDate(ActionEvent actionEvent) {
-        datePick.show();
-        datePick.getValue();
-        datePick.valueProperty().get();
-        System.out.println(datePick.getValue());
-        System.out.println(datePick.valueProperty().get());
-
-//        datePick.valueProperty().getValue().
-    }
-
     public void modifyAppointment(ActionEvent actionEvent) throws SQLException {
         if (aTableView.getSelectionModel().isEmpty()){
             AlertBox.display("Error Message", "No Appointment is Selected!");
@@ -576,8 +567,8 @@ public class AppointmentsController implements Initializable {
         String location;
         int contactID;
         String type;
-        LocalDateTime dateStart;
-        LocalDateTime dateEnd;
+        ZonedDateTime dateStart;
+        ZonedDateTime dateEnd;
 
         int customerID;
         int userID;
@@ -657,8 +648,8 @@ public class AppointmentsController implements Initializable {
         }
 
 
-        dateStart = LocalDateTime.of(startDatePick.getValue(), LocalTime.parse(startTimePick.getValue().toString()));
-        dateEnd = LocalDateTime.of(endDatePick.getValue(), LocalTime.parse(endTimePick.getValue().toString()));
+        dateStart = LocalDateTime.of(startDatePick.getValue(), LocalTime.parse(startTimePick.getValue().toString())).atZone(clientTimeZone);
+        dateEnd = LocalDateTime.of(endDatePick.getValue(), LocalTime.parse(endTimePick.getValue().toString())).atZone(clientTimeZone);
         if (dateStart.getDayOfWeek() == java.time.DayOfWeek.of(6) || dateStart.getDayOfWeek() == java.time.DayOfWeek.of(7)){
             AlertBox.display("Error Message", "The office does not accept weekend appointments!");
             return;
@@ -667,7 +658,14 @@ public class AppointmentsController implements Initializable {
             AlertBox.display("Error Message", "The office does not accept weekend appointments!");
             return;
         }
-//        if (dateStart.toLocalTime())
+        if (dateStart.withZoneSameInstant(clinicTimeZone).getHour() < 8 || dateStart.withZoneSameInstant(clinicTimeZone).getHour() > 22){
+            System.out.println(clinicTimeZone);
+            System.out.println(clientTimeZone);
+            System.out.println(dateStart.getHour());
+            System.out.println(dateStart.withZoneSameInstant(clinicTimeZone).getHour());
+            AlertBox.display("Error Message", "The office doesn't schedule outside of 8AM-5PM EST!");
+            return;
+        }
 
         try {
             customerID = Integer.parseInt(aCID.getText());
@@ -685,8 +683,14 @@ public class AppointmentsController implements Initializable {
         Appointment c = null;
         if (dynamicLabel.getText().equals("Adding an Appointment:")){
             try {
-                c = new Appointment(ID, title, description, location, contactID, type, dateStart, dateEnd, customerID, userID);
-                Appointments.addAppointment(ID, title, description, location, contactID, type, dateStart, dateEnd, customerID, userID);
+                c = new Appointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), customerID, userID);
+                if (!AppointmentsTime.isOverlapping(c)){
+                    Appointments.addAppointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), customerID, userID);
+                }
+                else {
+                    AlertBox.display("Error Message", "Appointments cannot be overlapping!");
+                    return;
+                }
             } catch (MysqlDataTruncation e) {
                 AlertBox.display("Error Message", "The date must be in the format of 'YYYY-MM-DD HH:MN:SS'. 0 <= YYYY < 10000, 0 < MM < 13, 00 < DD < 31, 00 <= HH < 25, 00 <= MN < 60, 00 <= SS < 60.");
                 Appointments.deleteAppointment(c);
@@ -695,8 +699,13 @@ public class AppointmentsController implements Initializable {
         }
         else if (dynamicLabel.getText().equals("Modifying Appointment:")){
             try {
-                c = new Appointment(ID, title, description, location, contactID, type, dateStart, dateEnd, customerID, userID);
-                Appointments.updateAppointment(aTableView.getItems().get(selectedIndex), c);
+                c = new Appointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), customerID, userID);
+                if (!AppointmentsTime.isOverlapping(c)){
+                    Appointments.updateAppointment(aTableView.getItems().get(selectedIndex), c);
+                } else {
+                    AlertBox.display("Error Message", "Appointments cannot be overlapping!");
+                    return;
+                }
             } catch (MysqlDataTruncation e) {
                 AlertBox.display("Error Message", "The date must be in the format of 'YYYY-MM-DD HH:MN:SS'. 0 <= YYYY < 10000, 0 < MM < 13, 00 < DD < 31, 00 <= HH < 25, 00 <= MN < 60, 00 <= SS < 60.");
                 Appointments.deleteAppointment(c);
