@@ -37,7 +37,7 @@ public class HelloController {
         rs.next();
         try {
             if (passwordTextField.getText().equals(rs.getString("Password"))) {
-                AppointmentsController.customerID = rs.getInt("User_ID");
+                AppointmentsController.userID = rs.getInt("User_ID");
                 openApts();
             } else {
                 AlertBox.display("Error", "Provided User/Password combination not found..");

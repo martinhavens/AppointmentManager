@@ -72,7 +72,7 @@ public class AppointmentsController implements Initializable {
     public static Integer customerID;
     public Label currentTimeZoneLabel;
     public Label clinicTimeZoneLabel;
-
+    public static Integer userID;
     Integer selectedIndex;
     ObservableList<Appointment> tempAppointments = Appointments.getAllAppointments();
     ObservableList<Customer> tempCustomers = Customers.getAllCustomers();
@@ -178,6 +178,21 @@ public class AppointmentsController implements Initializable {
 
         currentTimeZoneLabel.setText(String.valueOf(clientTimeZone));
         clinicTimeZoneLabel.setText(String.valueOf(clinicTimeZone));
+        try {
+            System.out.println(userID);
+            String alert = "";
+            ObservableList loginList = AppointmentsTime.checkForAppointmentsOnLogin(userID);
+            System.out.println(loginList.size());
+            if (loginList.size() > 0){
+                for (Object e : loginList){
+                    alert = alert + e + " !  ";
+                }
+                AlertBox.display("Alert!", String.format("Appointments within 15 minutes are:  %s", alert));
+            } else { ; }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
     public void modifyCustomer(ActionEvent actionEvent) throws SQLException {
         if (cTableView.getSelectionModel().isEmpty()){

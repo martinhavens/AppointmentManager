@@ -1,6 +1,7 @@
 package DBAccess;
 
 import Model.Appointment;
+import com.example.appointmentmanager.AppointmentsController;
 import helper.JDBC;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 public abstract class AppointmentsTime {
 
@@ -91,10 +93,23 @@ public abstract class AppointmentsTime {
         return false;
     }
 
-    public void checkForAppointmentsOnLogin(Integer userID){
+    public static ObservableList checkForAppointmentsOnLogin(Integer userID) throws SQLException {
+        ObservableList alist = FXCollections.observableArrayList();
         String sql = String.format("SELECT * FROM Appointments WHERE User_ID = '%d';", userID);
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
+//        LocalDateTime i = (rs.getTimestamp("Start").toLocalDateTime().atZone(AppointmentsController.clientTimeZone) - (LocalDateTime.now().atZone(AppointmentsController.clientTimeZone);
+        while (rs.next()){
+//            System.out.println(LocalDateTime.now().toLocalDate());
+//            System.out.println(rs.getTimestamp("Start").toLocalDateTime().toLocalDate());
+//            System.out.println(LocalDateTime.now().toLocalDate() == rs.getTimestamp("Start").toLocalDateTime().toLocalDate());
+//            System.out.println(rs.getTimestamp("Start").toLocalDateTime().atZone(AppointmentsController.clientTimeZone).toLocalTime().until(LocalDateTime.now().atZone(AppointmentsController.clientTimeZone).toLocalTime(), ChronoUnit.MINUTES) <= 15);
+            if (LocalDateTime.now().toLocalDate().isEqual(rs.getTimestamp("Start").toLocalDateTime().toLocalDate()) && rs.getTimestamp("Start").toLocalDateTime().atZone(AppointmentsController.clientTimeZone).toLocalTime().until(LocalDateTime.now().atZone(AppointmentsController.clientTimeZone).toLocalTime(), ChronoUnit.MINUTES) <= 15){
+                alist.add(rs.getInt("Appointment_ID"));
+                System.out.println("23");
+            }
+        }
+        return alist;
     }
 
 }

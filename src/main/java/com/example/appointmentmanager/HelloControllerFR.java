@@ -39,7 +39,7 @@ public class HelloControllerFR {
         rs.next();
         try {
             if (passwordTextField.getText().equals(rs.getString("Password"))) {
-                AppointmentsController.customerID = rs.getInt("User_ID");
+                AppointmentsController.userID = rs.getInt("User_ID");
                 System.out.println(AppointmentsController.customerID);
                 System.out.println(AppointmentsController.clientTimeZone);
                 System.out.println(Calendar.getInstance().getTimeZone().getRawOffset());
