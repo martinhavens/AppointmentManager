@@ -68,6 +68,7 @@ public class AppointmentsController implements Initializable {
     public Label referenceFrame;
     public static ZoneId clientTimeZone = ZoneId.of(Calendar.getInstance().getTimeZone().getID()); // Eastern Standard Time
     public static ZoneId clinicTimeZone = ZoneId.of("America/New_York"); // Eastern Standard Time
+    public static ZoneId utcTimeZone = ZoneOffset.UTC;
     public static Integer customerID;
     public Label currentTimeZoneLabel;
     public Label clinicTimeZoneLabel;
@@ -206,8 +207,7 @@ public class AppointmentsController implements Initializable {
             cDivision.getSelectionModel().selectNext();
         }
         customerEnable();
-        addCustomer.setDisable(true);
-        deleteCustomer.setDisable(true);
+
     }
     public void customerEnable(){
         cName.setDisable(false);
@@ -453,8 +453,8 @@ public class AppointmentsController implements Initializable {
         aDescription.setText(String.valueOf(tempA.getDescription()));
         aLocation.setText(String.valueOf(tempA.getLocation()));
         startDatePick.setValue(tempA.getDateStart().toLocalDate());
-        startTimePick.setValue(tempA.getDateStart().toLocalTime());
-        endTimePick.setValue(tempA.getDateEnd().toLocalTime());
+        startTimePick.setValue(tempA.getDateStart().atZone(clientTimeZone).toLocalTime());
+        endTimePick.setValue(tempA.getDateEnd().atZone(clientTimeZone).toLocalTime());
         endDatePick.setValue(tempA.getDateEnd().toLocalDate());
         aCID.setText(String.valueOf(tempA.getCustomerID()));
         aUserID.setText(String.valueOf(tempA.getUserID()));
@@ -496,8 +496,10 @@ public class AppointmentsController implements Initializable {
         aCID.setText("");
         aUserID.setText("");
         aContact.setItems(null);
-        startTimePick.setItems(null);
-        endTimePick.setItems(null);
+        startTimePick.setValue(null);
+        endTimePick.setValue(null);
+        startTimePick.setDisable(true);
+        endTimePick.setDisable(true);
         aType.setText("");
         aTitle.setDisable(true);
         aAID.setDisable(true);
@@ -506,8 +508,6 @@ public class AppointmentsController implements Initializable {
         aCID.setDisable(true);
         aUserID.setDisable(true);
         aContact.setDisable(true);
-        startTimePick.setDisable(true);
-        endTimePick.setDisable(true);
         startDatePick.setValue(null);
         endDatePick.setValue(null);
         startDatePick.setDisable(true);
@@ -661,6 +661,7 @@ public class AppointmentsController implements Initializable {
         if (dateStart.withZoneSameInstant(clinicTimeZone).getHour() < 8 || dateStart.withZoneSameInstant(clinicTimeZone).getHour() > 22){
             System.out.println(clinicTimeZone);
             System.out.println(clientTimeZone);
+            System.out.println(utcTimeZone);
             System.out.println(dateStart.getHour());
             System.out.println(dateStart.withZoneSameInstant(clinicTimeZone).getHour());
             AlertBox.display("Error Message", "The office doesn't schedule outside of 8AM-5PM EST!");
@@ -683,9 +684,9 @@ public class AppointmentsController implements Initializable {
         Appointment c = null;
         if (dynamicLabel.getText().equals("Adding an Appointment:")){
             try {
-                c = new Appointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), customerID, userID);
+                c = new Appointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clientTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clientTimeZone).toLocalDateTime(), customerID, userID);
                 if (!AppointmentsTime.isOverlapping(c)){
-                    Appointments.addAppointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), customerID, userID);
+                    Appointments.addAppointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clientTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clientTimeZone).toLocalDateTime(), customerID, userID);
                 }
                 else {
                     AlertBox.display("Error Message", "Appointments cannot be overlapping!");
@@ -699,7 +700,7 @@ public class AppointmentsController implements Initializable {
         }
         else if (dynamicLabel.getText().equals("Modifying Appointment:")){
             try {
-                c = new Appointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clinicTimeZone).toLocalDateTime(), customerID, userID);
+                c = new Appointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clientTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clientTimeZone).toLocalDateTime(), customerID, userID);
                 if (!AppointmentsTime.isOverlapping(c)){
                     Appointments.updateAppointment(aTableView.getItems().get(selectedIndex), c);
                 } else {

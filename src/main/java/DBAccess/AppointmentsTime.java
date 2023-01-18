@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -65,19 +66,22 @@ public abstract class AppointmentsTime {
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         while (rs.next()){
-            String start = rs.getString("Start");
-            String end = rs.getString("End");
+            if (rs.getInt("Appointment_ID") == a.getAppointmentID()){
+                continue;
+            }
+            LocalDateTime start = rs.getTimestamp("Start").toLocalDateTime();
+            LocalDateTime end = rs.getTimestamp("End").toLocalDateTime();
             System.out.println(start);
             System.out.println(end);
-            System.out.println(LocalDateTime.parse(start));
+            System.out.println(start);
             System.out.println(a.getDateStart());
 
 
-            System.out.println(LocalDateTime.parse(start).isEqual(a.getDateStart()));
-            System.out.println(LocalDateTime.parse(end).isBefore(a.getDateEnd()));
-            System.out.println(LocalDateTime.parse(start).isAfter(a.getDateStart()));
-            System.out.println(LocalDateTime.parse(start).isBefore(a.getDateEnd()));
-            if ((LocalDateTime.parse(start).isEqual(a.getDateStart()) && LocalDateTime.parse(end).isBefore(a.getDateEnd())) || (LocalDateTime.parse(start).isAfter(a.getDateStart()) && LocalDateTime.parse(start).isBefore(a.getDateEnd()))){
+            System.out.println(start.isEqual(a.getDateStart()));
+            System.out.println(end.isBefore(a.getDateEnd()));
+            System.out.println(start.isAfter(a.getDateStart()));
+            System.out.println(start.isBefore(a.getDateEnd()));
+            if ((start.isEqual(a.getDateStart()) && end.isBefore(a.getDateEnd())) || (start.isAfter(a.getDateStart()) && start.isBefore(a.getDateEnd()))){
                 return true;
             }
         }

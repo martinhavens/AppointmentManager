@@ -1,6 +1,7 @@
 package DBAccess;
 
 import Model.Appointment;
+import com.example.appointmentmanager.AppointmentsController;
 import helper.JDBC;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,8 +16,6 @@ import java.time.format.DateTimeFormatter;
 import static java.time.ZoneOffset.UTC;
 
 public class Appointments {
-
-    public static ObservableList<Appointment> allAppointments = FXCollections.observableArrayList();
 
     public static ObservableList<Appointment> getAllAppointments() throws SQLException {
 
@@ -36,13 +35,12 @@ public class Appointments {
                 int contactID = rs.getInt("Contact_ID");
                 String type = rs.getString("Type");
 
-                LocalDateTime dateStart = rs.getTimestamp("Start").toLocalDateTime();
-                LocalDateTime dateEnd = rs.getTimestamp("End").toLocalDateTime();
+                LocalDateTime dateStart = rs.getTimestamp("Start").toLocalDateTime().atZone(AppointmentsController.clientTimeZone).toLocalDateTime();
+                LocalDateTime dateEnd = rs.getTimestamp("End").toLocalDateTime().atZone(AppointmentsController.clientTimeZone).toLocalDateTime();
 
                 int customerID = rs.getInt("Customer_ID");
                 int userID = rs.getInt("User_ID");
                 Appointment c = new Appointment(app_id, title, desc, location, contactID, type, dateStart, dateEnd, customerID, userID);
-                allAppointments.add(c);
                 alist.add(c);
             }
         }
@@ -75,8 +73,10 @@ public class Appointments {
     public static void addAppointment(Integer ID, String title, String description, String location, int contactID, String type, LocalDateTime dateStart, LocalDateTime dateEnd, int customerID, int userID) throws SQLException { //, dateStart.atZone(ZoneId.ofOffset("UTC", UTC)), dateEnd.atZone(ZoneId.ofOffset("UTC", UTC))
         String sql = String.format("INSERT INTO appointments (Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, Contact_ID) VALUES (%d, '%s', '%s', '%s', '%s', ?, ?, %d, %d, %d);", ID, title, description, location, type, customerID, userID, contactID);
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
-        ps.setTimestamp(1, Timestamp.valueOf(dateStart));
-        ps.setTimestamp(2, Timestamp.valueOf(dateEnd));
+        ZonedDateTime dateS = dateStart.atZone(AppointmentsController.clientTimeZone);
+        ZonedDateTime dateE = dateEnd.atZone(AppointmentsController.clientTimeZone);
+        ps.setTimestamp(1, Timestamp.valueOf(dateS.toLocalDateTime()));
+        ps.setTimestamp(2, Timestamp.valueOf(dateE.toLocalDateTime()));
         int rowsAffected = ps.executeUpdate();
     }
 

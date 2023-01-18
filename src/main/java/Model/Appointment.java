@@ -1,7 +1,9 @@
 package Model;
 
 import DBAccess.Appointments;
+import DBAccess.AppointmentsTime;
 import DBAccess.Contacts;
+import com.example.appointmentmanager.AppointmentsController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -109,7 +111,7 @@ public class Appointment {
     }
 
     public LocalDateTime getDateStart() {
-        return dateStart;
+        return dateStart.atZone(AppointmentsController.clientTimeZone).toLocalDateTime();
     }
 
     public void setDateStart(LocalDateTime dateStart) {
@@ -117,7 +119,7 @@ public class Appointment {
     }
 
     public LocalDateTime getDateEnd() {
-        return dateEnd;
+        return dateEnd.atZone(AppointmentsController.clientTimeZone).toLocalDateTime();
     }
 
     public void setDateEnd(LocalDateTime dateEnd) {

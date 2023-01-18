@@ -13,8 +13,8 @@
           <TableColumn fx:id="aTLocation" prefWidth="89.0" text="Location" />
           <TableColumn fx:id="aTContactID" prefWidth="89.0" text="Contact" />
           <TableColumn fx:id="aTType" prefWidth="105.0" text="Type" />
-          <TableColumn fx:id="aTStart" prefWidth="126.0" text="Start" />
-          <TableColumn fx:id="aTEnd" prefWidth="128.0" text="End" />
+          <TableColumn fx:id="aTStart" prefWidth="126.0" text="Start (Local Time)" />
+          <TableColumn fx:id="aTEnd" prefWidth="128.0" text="End (Local Time)" />
           <TableColumn fx:id="aTCID" prefWidth="86.0" text="Customer ID" />
           <TableColumn fx:id="atUID" prefWidth="91.0" text="User ID" />
       </columns>
@@ -33,30 +33,30 @@
     <TextField fx:id="cCID" layoutX="933.0" layoutY="44.0" prefHeight="25.0" prefWidth="59.0" />
     <Label layoutX="855.0" layoutY="48.0" text="Customer ID:" />
     <Label layoutX="622.0" layoutY="48.0" text="Name:" />
-    <TextField fx:id="cName" layoutX="675.0" layoutY="44.0" prefHeight="25.0" prefWidth="173.0" />
-    <TextField fx:id="cAddress" layoutX="675.0" layoutY="87.0" prefHeight="25.0" prefWidth="317.0" />
+    <TextField fx:id="cName" layoutX="675.0" layoutY="44.0" prefHeight="25.0" prefWidth="173.0" promptText="Name" />
+    <TextField fx:id="cAddress" layoutX="675.0" layoutY="87.0" prefHeight="25.0" prefWidth="317.0" promptText="Address" />
     <Label layoutX="617.0" layoutY="91.0" text="Address:" />
     <Label layoutX="614.0" layoutY="135.0" text="Phone Number:" />
-    <TextField fx:id="cPhone" layoutX="704.0" layoutY="129.0" prefHeight="25.0" prefWidth="124.0" />
+    <TextField fx:id="cPhone" layoutX="704.0" layoutY="129.0" prefHeight="25.0" prefWidth="124.0" promptText="Phone" />
     <Label layoutX="853.0" layoutY="135.0" text="Postal Code:" />
-    <TextField fx:id="cPostal" layoutX="933.0" layoutY="129.0" prefHeight="25.0" prefWidth="59.0" />
+    <TextField fx:id="cPostal" layoutX="933.0" layoutY="129.0" prefHeight="25.0" prefWidth="59.0" promptText="Code" />
     <Label layoutX="614.0" layoutY="170.0" text="Country" />
     <Label layoutX="774.0" layoutY="170.0" text="Division" />
     <Label layoutX="53.0" layoutY="275.0" text="Title:" />
-    <TextField fx:id="aTitle" layoutX="87.0" layoutY="271.0" prefHeight="25.0" prefWidth="145.0" />
+    <TextField fx:id="aTitle" layoutX="87.0" layoutY="271.0" prefHeight="25.0" prefWidth="145.0" promptText="Title" />
     <Label layoutX="53.0" layoutY="308.0" text="Appointment ID:" />
     <TextField fx:id="aAID" layoutX="173.0" layoutY="304.0" prefHeight="25.0" prefWidth="59.0" />
     <Label layoutX="53.0" layoutY="342.0" text="Description:" />
-    <TextField fx:id="aDescription" layoutX="124.0" layoutY="338.0" prefHeight="25.0" prefWidth="297.0" />
+    <TextField fx:id="aDescription" layoutX="124.0" layoutY="338.0" prefHeight="25.0" prefWidth="297.0" promptText="Description" />
     <Label layoutX="520.0" layoutY="374.0" text="Type:" />
-    <TextField fx:id="aLocation" layoutX="124.0" layoutY="370.0" prefHeight="25.0" prefWidth="145.0" />
+    <TextField fx:id="aLocation" layoutX="124.0" layoutY="370.0" prefHeight="25.0" prefWidth="145.0" promptText="Location" />
     <ComboBox fx:id="aContact" layoutX="337.0" layoutY="370.0" prefHeight="25.0" prefWidth="167.0" />
     <Label layoutX="286.0" layoutY="374.0" text="Contact:" />
     <Label layoutX="436.0" layoutY="342.0" text="Customer ID:" />
-    <TextField fx:id="aCID" layoutX="521.0" layoutY="338.0" prefHeight="25.0" prefWidth="59.0" />
+    <TextField fx:id="aCID" layoutX="521.0" layoutY="338.0" prefHeight="25.0" prefWidth="59.0" promptText="ID" />
     <Label layoutX="593.0" layoutY="342.0" text="User ID:" />
-    <TextField fx:id="aUserID" layoutX="652.0" layoutY="338.0" prefHeight="25.0" prefWidth="59.0" />
-    <TextField fx:id="aType" layoutX="556.0" layoutY="370.0" prefHeight="25.0" prefWidth="158.0" />
+    <TextField fx:id="aUserID" layoutX="652.0" layoutY="338.0" prefHeight="25.0" prefWidth="59.0" promptText="ID" />
+    <TextField fx:id="aType" layoutX="556.0" layoutY="370.0" prefHeight="25.0" prefWidth="158.0" promptText="Type" />
     <Label layoutX="53.0" layoutY="374.0" text="Location:" />
     <Button fx:id="saveAppointment" layoutX="583.0" layoutY="304.0" mnemonicParsing="false" onAction="#createAppointment" text="Save" />
     <Button fx:id="cancelAppointment" layoutX="649.0" layoutY="304.0" mnemonicParsing="false" onAction="#cancelAppointment" text="Cancel" />
@@ -64,8 +64,8 @@
     <ComboBox fx:id="cDivision" layoutX="828.0" layoutY="166.0" prefWidth="150.0" />
     <Button fx:id="saveCustomer" layoutX="881.0" layoutY="205.0" mnemonicParsing="false" onAction="#createCustomer" text="Save" />
     <Button fx:id="cancelCustomer" layoutX="933.0" layoutY="205.0" mnemonicParsing="false" onAction="#cancelCustomer" prefHeight="25.0" prefWidth="59.0" text="Cancel" />
-    <Label layoutX="262.0" layoutY="275.0" text="Start:" />
-    <Label layoutX="262.0" layoutY="308.0" text="End:" />
+    <Label layoutX="251.0" layoutY="275.0" text="Start:" />
+    <Label layoutX="256.0" layoutY="308.0" text="End:" />
     <RadioButton fx:id="monthlyFilter" layoutX="379.0" layoutY="639.0" mnemonicParsing="false" onAction="#appointmentsMonthly" text="month">
       <toggleGroup>
          <ToggleGroup fx:id="filterGroup" />
@@ -82,8 +82,8 @@
     <Button fx:id="modifyCustomer" layoutX="762.0" layoutY="205.0" mnemonicParsing="false" onAction="#modifyCustomer" text="Modify Customer" />
     <Button fx:id="deleteAppointment" layoutX="46.0" layoutY="696.0" mnemonicParsing="false" onAction="#deleteAppointment" prefHeight="25.0" prefWidth="127.0" text="Delete Appointment" />
    <Button fx:id="deleteCustomer" layoutX="764.0" layoutY="240.0" mnemonicParsing="false" onAction="#deleteCustomer" text="Delete Customer" />
-   <DatePicker fx:id="endDatePick" layoutX="292.0" layoutY="304.0" prefHeight="25.0" prefWidth="124.0" />
-   <DatePicker fx:id="startDatePick" layoutX="293.0" layoutY="271.0" prefHeight="25.0" prefWidth="124.0" />
+   <DatePicker fx:id="endDatePick" layoutX="280.0" layoutY="304.0" prefHeight="25.0" prefWidth="136.0" promptText="Date / Local Time" />
+   <DatePicker fx:id="startDatePick" layoutX="281.0" layoutY="271.0" prefHeight="25.0" prefWidth="136.0" promptText="Date / Local Time" />
    <ComboBox fx:id="startTimePick" layoutX="421.0" layoutY="271.0" prefHeight="25.0" prefWidth="127.0" />
    <ComboBox fx:id="endTimePick" layoutX="421.0" layoutY="304.0" prefHeight="25.0" prefWidth="127.0" />
    <Button fx:id="filterHigher" layoutX="516.0" layoutY="635.0" mnemonicParsing="false" text="&gt;" />
