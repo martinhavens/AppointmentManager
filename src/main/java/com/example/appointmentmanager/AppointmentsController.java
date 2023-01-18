@@ -659,6 +659,7 @@ public class AppointmentsController implements Initializable {
             return;
         }
         if (dateStart.withZoneSameInstant(clinicTimeZone).getHour() < 8 || dateStart.withZoneSameInstant(clinicTimeZone).getHour() > 22){
+            System.out.println("CLOSED!");
             System.out.println(clinicTimeZone);
             System.out.println(clientTimeZone);
             System.out.println(utcTimeZone);
@@ -685,6 +686,8 @@ public class AppointmentsController implements Initializable {
         if (dynamicLabel.getText().equals("Adding an Appointment:")){
             try {
                 c = new Appointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clientTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clientTimeZone).toLocalDateTime(), customerID, userID);
+//                AppointmentsTime.isOverlapping(c);
+//                Appointments.addAppointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clientTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clientTimeZone).toLocalDateTime(), customerID, userID);
                 if (!AppointmentsTime.isOverlapping(c)){
                     Appointments.addAppointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clientTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clientTimeZone).toLocalDateTime(), customerID, userID);
                 }
@@ -701,6 +704,8 @@ public class AppointmentsController implements Initializable {
         else if (dynamicLabel.getText().equals("Modifying Appointment:")){
             try {
                 c = new Appointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clientTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clientTimeZone).toLocalDateTime(), customerID, userID);
+//                AppointmentsTime.isOverlapping(c);
+//                Appointments.updateAppointment(aTableView.getItems().get(selectedIndex), c);
                 if (!AppointmentsTime.isOverlapping(c)){
                     Appointments.updateAppointment(aTableView.getItems().get(selectedIndex), c);
                 } else {

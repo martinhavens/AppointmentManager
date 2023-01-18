@@ -73,20 +73,28 @@ public abstract class AppointmentsTime {
             LocalDateTime end = rs.getTimestamp("End").toLocalDateTime();
             System.out.println(start);
             System.out.println(end);
-            System.out.println(start);
+            System.out.println(a.getDateEnd());
             System.out.println(a.getDateStart());
 
-
+//            ((a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && (a.getDateStart().isBefore(end) || a.getDateStart().isEqual(end)));
+//            (a.getDateStart().isBefore(start) || a.getDateStart().isEqual(start)) && (a.getDateEnd().isBefore(end) || a.getDateStart().isEqual(end));
+//            (a.getDateStart().isBefore(start) || a.getDateStart().isEqual(start)) && (a.getDateEnd().isAfter(end) || a.getDateEnd().isEqual(end));
             System.out.println(start.isEqual(a.getDateStart()));
             System.out.println(end.isBefore(a.getDateEnd()));
             System.out.println(start.isAfter(a.getDateStart()));
             System.out.println(start.isBefore(a.getDateEnd()));
-            if ((start.isEqual(a.getDateStart()) && end.isBefore(a.getDateEnd())) || (start.isAfter(a.getDateStart()) && start.isBefore(a.getDateEnd()))){
+            if (((a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && (a.getDateStart().isBefore(end) || a.getDateStart().isEqual(end))) || (a.getDateStart().isBefore(start) || a.getDateStart().isEqual(start)) && (a.getDateEnd().isBefore(end) || a.getDateStart().isEqual(end)) || (a.getDateStart().isBefore(start) || a.getDateStart().isEqual(start)) && (a.getDateEnd().isAfter(end) || a.getDateEnd().isEqual(end))){
                 return true;
             }
         }
 
         return false;
+    }
+
+    public void checkForAppointmentsOnLogin(Integer userID){
+        String sql = String.format("SELECT * FROM Appointments WHERE User_ID = '%d';", userID);
+        PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
     }
 
 }
