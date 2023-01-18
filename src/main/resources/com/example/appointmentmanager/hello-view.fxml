@@ -14,7 +14,7 @@
    <Label fx:id="loginMainLabel" layoutX="239.0" layoutY="101.0" text="Enter your information:" />
    <Button layoutX="492.0" layoutY="41.0" mnemonicParsing="false" onAction="#exitApp" prefHeight="25.0" prefWidth="56.0" text="Exit" />
    <Button layoutX="473.0" layoutY="89.0" mnemonicParsing="false" onAction="#closeConnection" text="DB Disconnect" />
-   <Button layoutX="434.0" layoutY="182.0" mnemonicParsing="false" onAction="#showMe" text="All Appts" />
+   <Button layoutX="434.0" layoutY="182.0" mnemonicParsing="false" text="All Appts" />
    <Button layoutX="440.0" layoutY="249.0" mnemonicParsing="false" onAction="#openApts" text="Open Apts View" />
    <Label layoutX="290.0" layoutY="287.0" text="EN" />
 </AnchorPane>

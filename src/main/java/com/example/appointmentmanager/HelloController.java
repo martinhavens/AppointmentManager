@@ -1,11 +1,7 @@
 package com.example.appointmentmanager;
 
-import DBAccess.Appointments;
-import Model.Appointment;
 import helper.AlertBox;
 import helper.JDBC;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -28,9 +24,8 @@ public class HelloController {
     public Label passwordLabel;
     public Label loginMainLabel;
     public AnchorPane anchorPane;
-    //    Locale.setDefault(new Locale("fr"));
 
-    public void logInEN(ActionEvent actionEvent) throws SQLException, IOException {
+    public void logInEN() throws SQLException, IOException {
         String sql = String.format("SELECT * FROM users WHERE User_Name = '%s';", usernameTextField.getText());
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
@@ -48,23 +43,15 @@ public class HelloController {
 
     }
 
-    public void exitApp(ActionEvent actionEvent) {
+    public void exitApp() {
         Stage stage;
         stage = (Stage) anchorPane.getScene().getWindow();
         System.out.println("Program closed by user!");
         stage.close();
     }
 
-    public void closeConnection(ActionEvent actionEvent) {
+    public void closeConnection() {
         JDBC.closeConnection();
-    }
-
-
-    public void showMe(ActionEvent actionEvent) throws SQLException {
-        ObservableList<Appointment> alist = Appointments.getAllAppointments();
-        for (Appointment A: alist){
-            System.out.println(A);
-        }
     }
 
     public void openApts() throws IOException {

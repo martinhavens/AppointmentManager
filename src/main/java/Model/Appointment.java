@@ -1,18 +1,10 @@
 package Model;
 
 import DBAccess.Appointments;
-import DBAccess.AppointmentsTime;
 import DBAccess.Contacts;
 import com.example.appointmentmanager.AppointmentsController;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class Appointment {
     Integer appointmentID;
@@ -129,7 +121,5 @@ public class Appointment {
     public void setUserID(int userID) {
         this.userID = userID;
     }
-//    public void addAppointment(){
-//        allAppointments.add()
-//    }
+
 }

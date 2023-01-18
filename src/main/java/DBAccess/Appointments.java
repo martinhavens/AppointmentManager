@@ -6,14 +6,12 @@ import helper.JDBC;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.sql.*;
-import java.text.SimpleDateFormat;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-
-import static java.time.ZoneOffset.UTC;
 
 public class Appointments {
 
@@ -77,7 +75,7 @@ public class Appointments {
         ZonedDateTime dateE = dateEnd.atZone(AppointmentsController.clientTimeZone);
         ps.setTimestamp(1, Timestamp.valueOf(dateS.toLocalDateTime()));
         ps.setTimestamp(2, Timestamp.valueOf(dateE.toLocalDateTime()));
-        int rowsAffected = ps.executeUpdate();
+        ps.executeUpdate();
     }
 
     public static void addAppointment(Appointment newAppointment) throws SQLException {
@@ -97,7 +95,7 @@ public class Appointments {
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         ps.setTimestamp(1, Timestamp.valueOf(dateStart));
         ps.setTimestamp(2, Timestamp.valueOf(dateEnd));
-        int rowsAffected = ps.executeUpdate();
+        ps.executeUpdate();
     }
 
     public static boolean deleteAppointment(Appointment selectedAppointment) throws SQLException {

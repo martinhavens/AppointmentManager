@@ -1,6 +1,5 @@
 package DBAccess;
 
-import Model.Appointment;
 import Model.Contact;
 import helper.JDBC;
 import javafx.collections.FXCollections;
@@ -38,15 +37,6 @@ public abstract class Contacts {
         }
         return contactDiction;
     }
-//    public static HashMap<Integer, String> contactDictionary() throws SQLException {
-//        HashMap<Integer, String> contactDiction = new HashMap<>();
-//        for (Contact C: getAllContacts()){
-//            int id = C.getContactID();
-//            String name = C.getName();
-//            contactDiction.put(id, name);
-//        }
-//        return contactDiction;
-//    }
 
     public static ObservableList<Contact> getAllContacts() throws SQLException {
         ObservableList<Contact> clist = FXCollections.observableArrayList();
@@ -73,13 +63,10 @@ public abstract class Contacts {
     public static ObservableList<String> getAllContactNames() {
 
         ObservableList<String> clist = FXCollections.observableArrayList();
-
         try {
             String sql = "SELECT * from contacts";
-
             PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-
             while (rs.next()){
                 Integer contact_id = rs.getInt("Contact_ID");
                 String name = rs.getString("Contact_Name");
@@ -92,7 +79,6 @@ public abstract class Contacts {
         catch (Exception e){
             e.printStackTrace();
         }
-
         return clist;
     }
 

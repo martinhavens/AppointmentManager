@@ -1,6 +1,5 @@
 package DBAccess;
 
-import Model.Appointment;
 import Model.Customer;
 import helper.AlertBox;
 import helper.JDBC;
@@ -152,7 +151,7 @@ public class Customers {
     public static void addCustomer(Integer ID, String name, String address, String phone, String postal, Integer division) throws SQLException {
         String sql = String.format("INSERT INTO customers (Customer_ID, Customer_Name, Address, Postal_Code, Phone, Division_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%d');", ID, name, address, postal, phone, division);
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
-        int rowsAffected = ps.executeUpdate();
+        ps.executeUpdate();
     }
 
     public static void addCustomer(Customer newCustomer) throws SQLException {
@@ -164,7 +163,7 @@ public class Customers {
         String division = newCustomer.getDivision();
         String sql = String.format("INSERT INTO customers (Customer_ID, Customer_Name, Address, Postal_Code, Phone, Division_ID) VALUES (%d, '%s', '%s', '%s', '%s', '%d');", ID, name, address, postal, phone, Customers.divisionsMap.get(division));
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
-        int rowsAffected = ps.executeUpdate();
+        ps.executeUpdate();
     }
 
     public static void updateCustomer(Customer oldCustomer, Customer newCustomer) throws SQLException {

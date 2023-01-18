@@ -1,7 +1,6 @@
 package com.example.appointmentmanager;
 import DBAccess.Appointments;
-//import DBAccess.AppointmentsTime;
-import DBAccess.AppointmentsTime;
+import helper.AppointmentsTime;
 import DBAccess.Contacts;
 import DBAccess.Customers;
 import Model.Appointment;
@@ -10,30 +9,18 @@ import Model.Customer;
 import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import helper.AlertBox;
 import helper.JDBC;
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.InputMethodEvent;
-
 import java.net.URL;
-import java.nio.file.FileSystems;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.*;
-import java.time.chrono.ChronoLocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class AppointmentsController implements Initializable {
@@ -68,8 +55,6 @@ public class AppointmentsController implements Initializable {
     public Label referenceFrame;
     public static ZoneId clientTimeZone = ZoneId.of(Calendar.getInstance().getTimeZone().getID()); // Eastern Standard Time
     public static ZoneId clinicTimeZone = ZoneId.of("America/New_York"); // Eastern Standard Time
-    public static ZoneId utcTimeZone = ZoneOffset.UTC;
-    public static Integer customerID;
     public Label currentTimeZoneLabel;
     public Label clinicTimeZoneLabel;
     public static Integer userID;
@@ -96,7 +81,6 @@ public class AppointmentsController implements Initializable {
     public TableColumn<Customer, String> cTPhoneNumber;
     public TableColumn<Customer, Integer> cTDivision;
     public TableColumn cTCountry;
-    public DatePicker datePick;
     public TextField aTitle;
     public TextField aDescription;
     public TextField aLocation;
@@ -117,13 +101,8 @@ public class AppointmentsController implements Initializable {
         aTLocation.setCellValueFactory(new PropertyValueFactory<>("location"));
         aTContactID.setCellValueFactory(new PropertyValueFactory<>("contactName"));
         aTType.setCellValueFactory(new PropertyValueFactory<>("type"));
-
         aTStart.setCellValueFactory(new PropertyValueFactory<>("dateStart"));
-//        aTStart.setCellValueFactory(cellData -> cellData.getValue().getDateStartDate().concat(" ").concat(cellData.getValue().getDateStartTime()));
-//        aTStart.setCellValueFactory(cellData -> Bindings.createStringBinding(() -> cellData.getValue().getDateStartDate() + " " + cellData.getValue().getDateStartTime()));
-//        aTEnd.setCellValueFactory(cellData -> Bindings.createStringBinding(() -> cellData.getValue().getDateEndDate() + " " + cellData.getValue().getDateEndTime()));
         aTEnd.setCellValueFactory(new PropertyValueFactory<>("dateEnd"));
-
         aTCID.setCellValueFactory(new PropertyValueFactory<>("customerID"));
         atUID.setCellValueFactory(new PropertyValueFactory<>("userID"));
         cTID.setCellValueFactory(new PropertyValueFactory<>("customerID"));
@@ -143,7 +122,6 @@ public class AppointmentsController implements Initializable {
         customerDisable();
         modifyCustomer.setDisable(true);
         deleteCustomer.setDisable(true);
-
         cTableView.getSelectionModel().selectedIndexProperty().addListener((obs, oldV, newV) -> {
             if (newV != null){
                 modifyCustomer.setDisable(false);
@@ -156,7 +134,6 @@ public class AppointmentsController implements Initializable {
         });
         modifyAppointment.setDisable(true);
         deleteAppointment.setDisable(true);
-
         aTableView.getSelectionModel().selectedIndexProperty().addListener((obse, oldVa, newVa) -> {
             if (newVa != null){
                 modifyAppointment.setDisable(false);
@@ -179,22 +156,21 @@ public class AppointmentsController implements Initializable {
         currentTimeZoneLabel.setText(String.valueOf(clientTimeZone));
         clinicTimeZoneLabel.setText(String.valueOf(clinicTimeZone));
         try {
-            System.out.println(userID);
-            String alert = "";
+            StringBuilder alert = new StringBuilder();
             ObservableList loginList = AppointmentsTime.checkForAppointmentsOnLogin(userID);
-            System.out.println(loginList.size());
             if (loginList.size() > 0){
                 for (Object e : loginList){
-                    alert = alert + e + " !  ";
+                    alert.append(e).append(" !  ");
                 }
                 AlertBox.display("Alert!", String.format("Appointments within 15 minutes are:  %s", alert));
-            } else { ; }
+            }
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
-    public void modifyCustomer(ActionEvent actionEvent) throws SQLException {
+
+    public void modifyCustomer() throws SQLException {
         if (cTableView.getSelectionModel().isEmpty()){
             AlertBox.display("Error Message", "No Customer is Selected!");
             return;
@@ -255,14 +231,13 @@ public class AppointmentsController implements Initializable {
         deleteCustomer.setDisable(true);
         addCustomer.setDisable(false);
     }
-    public void addCustomer(ActionEvent actionEvent) throws SQLException {
+    public void addCustomer() throws SQLException {
         customerDisable();
         customerEnable();
         int cid_c;
         int N = tempCustomers.size();
         if (N == 0) {
             cid_c = 1;
-            cCID.setText(Integer.toString(cid_c));
         } else {
             int[] arr = new int[N + 1];
             for (int i=0; i<N; i++) {
@@ -285,8 +260,8 @@ public class AppointmentsController implements Initializable {
                     ans = j + 1;
             }
             cid_c = ans;
-            cCID.setText(Integer.toString(cid_c));
         }
+        cCID.setText(Integer.toString(cid_c));
         dynamicLabel.setText("Adding a Customer:");
         cCountry.setItems(Customers.getAllCountries());
         cDivision.setItems(Customers.getAllDivisions());
@@ -294,105 +269,65 @@ public class AppointmentsController implements Initializable {
         modifyCustomer.setDisable(true);
         deleteCustomer.setDisable(true);
     }
-    public void createCustomer(ActionEvent actionEvent) throws SQLException {
+    public void createCustomer() throws SQLException {
         Integer ID;
         String name;
         String address;
         String phone;
         String postal;
-        String country;
         String division;
 
-        int customerID;
-        int userID;
-
         if (cName.getText().isEmpty()) {
-            AlertBox.display("Error Message", "Name is empty!");
-            return;
-        }
+            AlertBox.display("Error Message", "Name is empty!"); return; }
         if (cAddress.getText().isEmpty()) {
-            AlertBox.display("Error Message", "Address is empty!");
-            return;
-        }
+            AlertBox.display("Error Message", "Address is empty!"); return; }
         if (cPhone.getText().isEmpty()) {
-            AlertBox.display("Error Message", "Phone Number is empty!");
-            return;
-        }
-
+            AlertBox.display("Error Message", "Phone Number is empty!");return; }
         if (cPostal.getText().isEmpty()){
-            AlertBox.display("Error Message", "Postal Code is empty!");
-            return;
-        }
+            AlertBox.display("Error Message", "Postal Code is empty!"); return; }
         if (cCountry.getValue() == null){
-            AlertBox.display("Error Message", "Country is not selected!");
-            return;
-        }
+            AlertBox.display("Error Message", "Country is not selected!"); return; }
         if (cDivision.getValue() == null){
-            AlertBox.display("Error Message", "Division is not selected!");
-            return;
-        }
-        try {
-            ID = Integer.parseInt(cCID.getText());
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Customer ID is Invalid!");
-            return;
-        }
-        try {
-            name = cName.getText();
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Name is Invalid!");
-            return;
-        }
-        try {
-            address = cAddress.getText();
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Address is Invalid!");
-            return;
-        }
-        try {
-            phone = cPhone.getText();
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Phone is Invalid!");
-            return;
-        }
-        try {
-            country = (String)cCountry.getSelectionModel().getSelectedItem();
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Country is Invalid!");
-            return;
-        }
-        try {
-            division = (String)cDivision.getSelectionModel().getSelectedItem();
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Division is Invalid!");
-            return;
-        }
-        try {
-            postal = cPostal.getText();
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Postal Code is Invalid!");
-            return;
-        }
+            AlertBox.display("Error Message", "Division is not selected!"); return; }
+
+        try { ID = Integer.parseInt(cCID.getText()); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "Customer ID is Invalid!"); return; }
+        try { name = cName.getText(); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "Name is Invalid!"); return; }
+        try { address = cAddress.getText(); }
+            catch (NumberFormatException nfe) {
+                    AlertBox.display("Error Message", "Address is Invalid!"); return; }
+        try { phone = cPhone.getText(); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "Phone is Invalid!"); return; }
+        try { division = (String)cDivision.getSelectionModel().getSelectedItem(); }
+            catch (NumberFormatException nfe) {
+            AlertBox.display("Error Message", "Division is Invalid!"); return; }
+        try { postal = cPostal.getText(); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "Postal Code is Invalid!"); return; }
+
         Customer c = null;
         if (dynamicLabel.getText().equals("Adding a Customer:")){
             try {
                 c = new Customer(ID, name, address, phone, postal, Customers.divisionsMap.get(division));
                 Customers.addCustomer(ID, name, address, phone, postal, Customers.divisionsMap.get(division));
             } catch (Exception e) {
+                assert c != null;
                 Customers.deleteCustomer(c);
                 e.printStackTrace();
                 return;
             }
-        }
-
-        else if (dynamicLabel.getText().equals("Modifying Customer:")){
+        } else if (dynamicLabel.getText().equals("Modifying Customer:")){
             try {
                 c = new Customer(ID, name, address, phone, postal, Customers.divisionsMap.get(division));
                 Customers.updateCustomer(cTableView.getItems().get(selectedIndex), c);
             } catch (Exception e) {
                 e.printStackTrace();
+                assert c != null;
                 Customers.deleteCustomer(c);
-                e.printStackTrace();
                 return;
             }
         }
@@ -400,9 +335,8 @@ public class AppointmentsController implements Initializable {
         tempCustomers = Customers.getAllCustomers();
         customerDisable();
         dynamicLabel.setText("Select an Option:");
-
     }
-    public void cancelCustomer(ActionEvent actionEvent) throws SQLException {
+    public void cancelCustomer() throws SQLException {
         divisions = Customers.getAllDivisions();
         cName.clear();
         cCID.clear();
@@ -418,18 +352,12 @@ public class AppointmentsController implements Initializable {
         deleteCustomer.setDisable(true);
         dynamicLabel.setText("Select an Option:");
     }
-    public void deleteCustomer(ActionEvent actionEvent) throws SQLException {
+    public void deleteCustomer() throws SQLException {
         if (!cTableView.getSelectionModel().isEmpty()) {
             if (Customers.deleteCustomer(Customers.getAllCustomers().get(cTableView.getSelectionModel().getSelectedIndex()))){
                 AlertBox.display("Alert", "Customer was successfully deleted.");
-            }
-            else {
-                AlertBox.display("Alert", "Customer could not be deleted while having appointments.");
-            }
-        }
-        else {
-            AlertBox.display("Error Message", "No Customer was Selected.");
-        }
+            } else { AlertBox.display("Alert", "Customer could not be deleted while having appointments."); }
+        } else { AlertBox.display("Error Message", "No Customer was Selected."); }
         cTableView.getSelectionModel().clearSelection();
         modifyCustomer.setDisable(true);
         deleteCustomer.setDisable(true);
@@ -438,12 +366,11 @@ public class AppointmentsController implements Initializable {
     }
     public void filterDivisions() throws SQLException {
         divisions.clear();
-        //cDivision.setItems(Customers.getAllDivisions());
         Integer countryInt = Customers.countriesMap.get(cCountry.getSelectionModel().getSelectedItem());
         String sql = String.format("SELECT Division from first_level_divisions WHERE COUNTRY_ID ='%d';", countryInt);
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
-        String divisionName = null;
+        String divisionName;
         while (rs.next()){
             divisionName = rs.getString("Division");
             if (divisionName.equals("QuÃ©bec")){
@@ -454,7 +381,7 @@ public class AppointmentsController implements Initializable {
         cDivision.setItems(divisions);
     }
 
-    public void modifyAppointment(ActionEvent actionEvent) throws SQLException {
+    public void modifyAppointment() {
         if (aTableView.getSelectionModel().isEmpty()){
             AlertBox.display("Error Message", "No Appointment is Selected!");
             return;
@@ -486,7 +413,6 @@ public class AppointmentsController implements Initializable {
     }
     public void appointmentEnable(){
         aTitle.setDisable(false);
-//        aAID.setDisable(false);
         aDescription.setDisable(false);
         aLocation.setDisable(false);
         aCID.setDisable(false);
@@ -535,14 +461,13 @@ public class AppointmentsController implements Initializable {
         deleteAppointment.setDisable(false);
         modifyAppointment.setDisable(false);
     }
-    public void addAppointment(ActionEvent actionEvent) {
+    public void addAppointment() {
         appointmentDisable();
         appointmentEnable();
         int aid_c;
         int N = tempAppointments.size();
         if (N == 0) {
             aid_c = 1;
-            aAID.setText(Integer.toString(aid_c));
         } else {
             int[] arr = new int[N + 1];
             for (int i=0; i<N; i++) {
@@ -565,8 +490,8 @@ public class AppointmentsController implements Initializable {
                     ans = j + 1;
             }
             aid_c = ans;
-            aAID.setText(Integer.toString(aid_c));
         }
+        aAID.setText(Integer.toString(aid_c));
         dynamicLabel.setText("Adding an Appointment:");
         aContact.setItems(Contacts.getAllContactNames());
         startTimePick.setItems(AppointmentsTime.timeOptions());
@@ -575,7 +500,7 @@ public class AppointmentsController implements Initializable {
         modifyAppointment.setDisable(true);
         deleteAppointment.setDisable(true);
     }
-    public void createAppointment(ActionEvent actionEvent) throws SQLException {
+    public void createAppointment() throws SQLException {
         Integer ID;
         String title;
         String description;
@@ -593,122 +518,67 @@ public class AppointmentsController implements Initializable {
             return;
         }
         if (aDescription.getText().isEmpty()) {
-            AlertBox.display("Error Message", "Description is empty!");
-            return;
-        }
+            AlertBox.display("Error Message", "Description is empty!"); return; }
         if (aLocation.getText().isEmpty()) {
-            AlertBox.display("Error Message", "Location is empty!");
-            return;
-        }
+            AlertBox.display("Error Message", "Location is empty!"); return; }
         if (startDatePick.getValue() == null){
-            AlertBox.display("Error Message", "Date Start is empty!");
-            return;
-        }
+            AlertBox.display("Error Message", "Date Start is empty!"); return; }
         if (endDatePick.getValue() == null){
-            AlertBox.display("Error Message", "Date End is empty!");
-            return;
-        }
-
+            AlertBox.display("Error Message", "Date End is empty!"); return; }
         if (aCID.getText().isEmpty()) {
-            AlertBox.display("Error Message", "Customer ID is empty!");
-            return;
-        }
+            AlertBox.display("Error Message", "Customer ID is empty!"); return; }
         if (aUserID.getText().isEmpty()) {
-            AlertBox.display("Error Message", "User ID is empty!");
-            return;
-        }
+            AlertBox.display("Error Message", "User ID is empty!"); return; }
         if (aType.getText().isEmpty()) {
-            AlertBox.display("Error Message", "Type is empty!");
-            return;
-        }
+            AlertBox.display("Error Message", "Type is empty!"); return; }
         if (aContact.getSelectionModel().isEmpty()) {
-            AlertBox.display("Error Message", "No Contact is selected!");
-            return;
-        }
-        try {
-            ID = Integer.parseInt(aAID.getText());
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Appointment ID is Invalid!");
-            return;
-        }
-        try {
-            title = aTitle.getText();
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Title is Invalid!");
-            return;
-        }
-        try {
-            description = aDescription.getText();
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Description is Invalid!");
-            return;
-        }
-        try {
-            location = aLocation.getText();
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Location is Invalid!");
-            return;
-        }
-        try {
-            contactID = Contacts.reverseContactDictionary.get(aContact.getSelectionModel().getSelectedItem());
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Contact ID is Invalid!");
-            return;
-        }
-        try {
-            type = aType.getText();
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Type is Invalid!");
-            return;
-        }
+            AlertBox.display("Error Message", "No Contact is selected!"); return; }
 
+        try { ID = Integer.parseInt(aAID.getText()); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "Appointment ID is Invalid!"); return; }
+        try { title = aTitle.getText(); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "Title is Invalid!"); return; }
+        try { description = aDescription.getText(); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "Description is Invalid!"); return; }
+        try { location = aLocation.getText(); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "Location is Invalid!"); return; }
+        try { contactID = Contacts.reverseContactDictionary.get(aContact.getSelectionModel().getSelectedItem()); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "Contact ID is Invalid!"); return; }
+        try { type = aType.getText(); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "Type is Invalid!"); return; }
 
         dateStart = LocalDateTime.of(startDatePick.getValue(), LocalTime.parse(startTimePick.getValue().toString())).atZone(clientTimeZone);
         dateEnd = LocalDateTime.of(endDatePick.getValue(), LocalTime.parse(endTimePick.getValue().toString())).atZone(clientTimeZone);
-        if (dateStart.getDayOfWeek() == java.time.DayOfWeek.of(6) || dateStart.getDayOfWeek() == java.time.DayOfWeek.of(7)){
-            AlertBox.display("Error Message", "The office does not accept weekend appointments!");
-            return;
-        }
-        if (dateEnd.getDayOfWeek() == java.time.DayOfWeek.of(6) || dateEnd.getDayOfWeek() == java.time.DayOfWeek.of(7)){
-            AlertBox.display("Error Message", "The office does not accept weekend appointments!");
-            return;
-        }
-        if (dateStart.withZoneSameInstant(clinicTimeZone).getHour() < 8 || dateStart.withZoneSameInstant(clinicTimeZone).getHour() > 22){
-            System.out.println("CLOSED!");
-            System.out.println(clinicTimeZone);
-            System.out.println(clientTimeZone);
-            System.out.println(utcTimeZone);
-            System.out.println(dateStart.getHour());
-            System.out.println(dateStart.withZoneSameInstant(clinicTimeZone).getHour());
-            AlertBox.display("Error Message", "The office doesn't schedule outside of 8AM-5PM EST!");
-            return;
-        }
 
-        try {
-            customerID = Integer.parseInt(aCID.getText());
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "Customer ID is Invalid!");
-            return;
-        }
-        try {
-            userID = Integer.parseInt(aUserID.getText());
-        } catch (NumberFormatException nfe) {
-            AlertBox.display("Error Message", "User ID is Invalid!");
-            return;
-        }
+        if (dateStart.getDayOfWeek() == java.time.DayOfWeek.of(6) || dateStart.getDayOfWeek() == java.time.DayOfWeek.of(7)){
+            AlertBox.display("Error Message", "The office does not accept weekend appointments!"); return; }
+        if (dateEnd.getDayOfWeek() == java.time.DayOfWeek.of(6) || dateEnd.getDayOfWeek() == java.time.DayOfWeek.of(7)){
+            AlertBox.display("Error Message", "The office does not accept weekend appointments!"); return; }
+        if (dateStart.withZoneSameInstant(clinicTimeZone).getHour() < 8 || dateStart.withZoneSameInstant(clinicTimeZone).getHour() > 22){
+            AlertBox.display("Error Message", "The office doesn't schedule outside of 8AM-5PM EST!"); return; }
+
+        try { customerID = Integer.parseInt(aCID.getText()); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "Customer ID is Invalid!"); return; }
+        try { userID = Integer.parseInt(aUserID.getText()); }
+            catch (NumberFormatException nfe) {
+                AlertBox.display("Error Message", "User ID is Invalid!"); return; }
 
         Appointment c = null;
         if (dynamicLabel.getText().equals("Adding an Appointment:")){
             try {
                 c = new Appointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clientTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clientTimeZone).toLocalDateTime(), customerID, userID);
-//                AppointmentsTime.isOverlapping(c);
-//                Appointments.addAppointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clientTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clientTimeZone).toLocalDateTime(), customerID, userID);
                 if (!AppointmentsTime.isOverlapping(c)){
                     Appointments.addAppointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clientTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clientTimeZone).toLocalDateTime(), customerID, userID);
                 }
                 else {
-                    AlertBox.display("Error Message", "Appointments cannot be overlapping!");
-                    return;
+                    AlertBox.display("Error Message", "Appointments cannot be overlapping!"); return;
                 }
             } catch (MysqlDataTruncation e) {
                 AlertBox.display("Error Message", "The date must be in the format of 'YYYY-MM-DD HH:MN:SS'. 0 <= YYYY < 10000, 0 < MM < 13, 00 < DD < 31, 00 <= HH < 25, 00 <= MN < 60, 00 <= SS < 60.");
@@ -719,13 +589,10 @@ public class AppointmentsController implements Initializable {
         else if (dynamicLabel.getText().equals("Modifying Appointment:")){
             try {
                 c = new Appointment(ID, title, description, location, contactID, type, dateStart.withZoneSameInstant(clientTimeZone).toLocalDateTime(), dateEnd.withZoneSameInstant(clientTimeZone).toLocalDateTime(), customerID, userID);
-//                AppointmentsTime.isOverlapping(c);
-//                Appointments.updateAppointment(aTableView.getItems().get(selectedIndex), c);
                 if (!AppointmentsTime.isOverlapping(c)){
                     Appointments.updateAppointment(aTableView.getItems().get(selectedIndex), c);
                 } else {
-                    AlertBox.display("Error Message", "Appointments cannot be overlapping!");
-                    return;
+                    AlertBox.display("Error Message", "Appointments cannot be overlapping!"); return;
                 }
             } catch (MysqlDataTruncation e) {
                 AlertBox.display("Error Message", "The date must be in the format of 'YYYY-MM-DD HH:MN:SS'. 0 <= YYYY < 10000, 0 < MM < 13, 00 < DD < 31, 00 <= HH < 25, 00 <= MN < 60, 00 <= SS < 60.");
@@ -738,13 +605,13 @@ public class AppointmentsController implements Initializable {
         tempAppointments = Appointments.getAllAppointments();
         appointmentDisable();
     }
-    public void cancelAppointment(ActionEvent actionEvent) {
+    public void cancelAppointment() {
         appointmentDisable();
         modifyAppointment.setDisable(true);
         deleteAppointment.setDisable(true);
         aTableView.getSelectionModel().clearSelection();
     }
-    public void deleteAppointment(ActionEvent actionEvent) throws SQLException {
+    public void deleteAppointment() throws SQLException {
             if (!aTableView.getSelectionModel().isEmpty()) {
                     if (Appointments.deleteAppointment(Appointments.getAllAppointments().get(aTableView.getSelectionModel().getSelectedIndex()))){
                         AlertBox.display("Alert", "Appointment was successfully deleted.");
@@ -760,14 +627,13 @@ public class AppointmentsController implements Initializable {
             tempAppointments = Appointments.getAllAppointments();
     }
 
-    public void appointmentsMonthly(ActionEvent actionEvent) throws SQLException {
+    public void appointmentsMonthly() throws SQLException {
         customerDisable();
         appointmentDisable();
         filterLower.setDisable(false);
         filterHigher.setDisable(false);
         tempAppointments = Appointments.getAllAppointments();
         LocalDateTime min = null;
-        int c = 0;
         if (referenceFrame.getText().equals("All")){
             for (Appointment a : tempAppointments){
                 if (min == null) {
@@ -775,7 +641,7 @@ public class AppointmentsController implements Initializable {
                 }
                 if (a.getDateStart().isBefore(min)){
                     min = a.getDateStart();
-                } else { }
+                }
             }
         } else {
             min = LocalDate.parse(referenceFrame.getText()).atStartOfDay();
@@ -793,7 +659,7 @@ public class AppointmentsController implements Initializable {
         filterHigher.setOnAction(e -> filterHigherMonth());
     }
 
-    public void appointmentsWeekly(ActionEvent actionEvent) throws SQLException {
+    public void appointmentsWeekly() throws SQLException {
         customerDisable();
         appointmentDisable();
         filterLower.setDisable(false);
@@ -810,7 +676,7 @@ public class AppointmentsController implements Initializable {
                 }
                 if (c < 0) {
                     min = a.getDateStart();
-                } else { }
+                }
             }
         } else {
             min = LocalDate.parse(referenceFrame.getText()).atStartOfDay();
@@ -826,8 +692,6 @@ public class AppointmentsController implements Initializable {
         filterLower.setOnAction(e -> filterLowerWeek());
         filterHigher.setOnAction(e -> filterHigherWeek());
     }
-
-    public static LocalDate mini;
 
     public void filterHigherMonth() {
         referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusMonths(1)));
@@ -887,7 +751,7 @@ public class AppointmentsController implements Initializable {
         }
     }
 
-    public void clearFilter(ActionEvent actionEvent) {
+    public void clearFilter() {
         weeklyFilter.setSelected(false);
         monthlyFilter.setSelected(false);
         aTableView.setItems(tempAppointments);
