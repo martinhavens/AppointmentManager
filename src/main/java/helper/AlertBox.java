@@ -18,7 +18,7 @@ public class AlertBox {
     public static void display(String title, String message) {
         Stage window = new Stage();
         window.setTitle(title);
-        window.setMinWidth(340);
+        window.setMinWidth(200);
 
         Label label = new Label();
         label.setText(message);

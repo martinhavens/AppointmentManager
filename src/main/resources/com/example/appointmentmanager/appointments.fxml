@@ -93,6 +93,6 @@
    <Label fx:id="referenceFrame" layoutX="450.0" layoutY="670.0" prefHeight="18.0" prefWidth="150.0" text="All" />
    <Label layoutX="578.0" layoutY="639.0" text="Current Time Zone:" />
    <Label layoutX="591.0" layoutY="662.0" text="Clinic time Zone:" />
-   <Label fx:id="clinicTimeZoneLabel" layoutX="698.0" layoutY="662.0" text="EST -5:00" />
+   <Label fx:id="clinicTimeZoneLabel" layoutX="700.0" layoutY="662.0" text="EST -5:00" />
    <Label fx:id="currentTimeZoneLabel" layoutX="700.0" layoutY="639.0" text="Null" />
 </AnchorPane>

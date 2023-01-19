@@ -15,12 +15,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+
+import java.net.ServerSocket;
 import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.*;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 public class AppointmentsController implements Initializable {
@@ -157,19 +160,21 @@ public class AppointmentsController implements Initializable {
         clinicTimeZoneLabel.setText(String.valueOf(clinicTimeZone));
         try {
             StringBuilder alert = new StringBuilder();
-            ObservableList loginList = AppointmentsTime.checkForAppointmentsOnLogin(userID);
+            HashMap loginList = AppointmentsTime.checkForAppointmentsOnLogin(userID);
             if (loginList.size() > 0){
-                for (Object e : loginList){
-                    alert.append(e).append(" !  ");
+                loginList.keySet();
+                for (Object s : loginList.keySet()){
+                        alert.append(String.format("Appointment ID %d at %s !  ", s ,loginList.get(s)));
                 }
                 AlertBox.display("Alert!", String.format("Appointments within 15 minutes are:  %s", alert));
+            } else if (loginList.size() == 0){
+                AlertBox.display("Alert!", "Found no appointments for user within 15 minutes.");
             }
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
-
     public void modifyCustomer() throws SQLException {
         if (cTableView.getSelectionModel().isEmpty()){
             AlertBox.display("Error Message", "No Customer is Selected!");
@@ -232,6 +237,7 @@ public class AppointmentsController implements Initializable {
         addCustomer.setDisable(false);
     }
     public void addCustomer() throws SQLException {
+        addAppointment.setDisable(true);
         customerDisable();
         customerEnable();
         int cid_c;
@@ -337,6 +343,7 @@ public class AppointmentsController implements Initializable {
         dynamicLabel.setText("Select an Option:");
     }
     public void cancelCustomer() throws SQLException {
+        addAppointment.setDisable(false);
         divisions = Customers.getAllDivisions();
         cName.clear();
         cCID.clear();
@@ -380,7 +387,6 @@ public class AppointmentsController implements Initializable {
         }
         cDivision.setItems(divisions);
     }
-
     public void modifyAppointment() {
         if (aTableView.getSelectionModel().isEmpty()){
             AlertBox.display("Error Message", "No Appointment is Selected!");
@@ -462,6 +468,7 @@ public class AppointmentsController implements Initializable {
         modifyAppointment.setDisable(false);
     }
     public void addAppointment() {
+        addCustomer.setDisable(true);
         appointmentDisable();
         appointmentEnable();
         int aid_c;
@@ -606,6 +613,7 @@ public class AppointmentsController implements Initializable {
         appointmentDisable();
     }
     public void cancelAppointment() {
+        addCustomer.setDisable(false);
         appointmentDisable();
         modifyAppointment.setDisable(true);
         deleteAppointment.setDisable(true);
@@ -626,7 +634,6 @@ public class AppointmentsController implements Initializable {
             aTableView.setItems(Appointments.getAllAppointments());
             tempAppointments = Appointments.getAllAppointments();
     }
-
     public void appointmentsMonthly() throws SQLException {
         customerDisable();
         appointmentDisable();
@@ -658,7 +665,6 @@ public class AppointmentsController implements Initializable {
         filterLower.setOnAction(e -> filterLowerMonth());
         filterHigher.setOnAction(e -> filterHigherMonth());
     }
-
     public void appointmentsWeekly() throws SQLException {
         customerDisable();
         appointmentDisable();
@@ -692,7 +698,6 @@ public class AppointmentsController implements Initializable {
         filterLower.setOnAction(e -> filterLowerWeek());
         filterHigher.setOnAction(e -> filterHigherWeek());
     }
-
     public void filterHigherMonth() {
         referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusMonths(1)));
         ObservableList tempItems = FXCollections.observableArrayList();
@@ -707,7 +712,6 @@ public class AppointmentsController implements Initializable {
             aTableView.setItems(tempItems);
         }
     }
-
     public void filterLowerMonth() {
         referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusMonths(-1)));
         ObservableList tempItems = FXCollections.observableArrayList();
@@ -750,7 +754,6 @@ public class AppointmentsController implements Initializable {
             aTableView.setItems(tempItems);
         }
     }
-
     public void clearFilter() {
         weeklyFilter.setSelected(false);
         monthlyFilter.setSelected(false);
@@ -759,5 +762,4 @@ public class AppointmentsController implements Initializable {
         filterLower.setDisable(true);
         filterHigher.setDisable(true);
     }
-
 }

@@ -9,7 +9,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Locale;
 
 public abstract class AppointmentsTime {
 
@@ -53,14 +56,14 @@ public abstract class AppointmentsTime {
 
         return false;
     }
-    public static ObservableList<Integer> checkForAppointmentsOnLogin(Integer userID) throws SQLException {
-        ObservableList<Integer> alist = FXCollections.observableArrayList();
+    public static HashMap<Integer, String> checkForAppointmentsOnLogin(Integer userID) throws SQLException {
+        HashMap<Integer, String> alist = new HashMap<>();
         String sql = String.format("SELECT * FROM Appointments WHERE User_ID = '%d';", userID);
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         while (rs.next()){
             if (LocalDateTime.now().toLocalDate().isEqual(rs.getTimestamp("Start").toLocalDateTime().toLocalDate()) && rs.getTimestamp("Start").toLocalDateTime().atZone(AppointmentsController.clientTimeZone).toLocalTime().until(LocalDateTime.now().atZone(AppointmentsController.clientTimeZone).toLocalTime(), ChronoUnit.MINUTES) >= -15 && rs.getTimestamp("Start").toLocalDateTime().atZone(AppointmentsController.clientTimeZone).toLocalTime().until(LocalDateTime.now().atZone(AppointmentsController.clientTimeZone).toLocalTime(), ChronoUnit.MINUTES) <= 0){
-                alist.add(rs.getInt("Appointment_ID"));
+                alist.put(rs.getInt("Appointment_ID"), (rs.getTimestamp("Start").toLocalDateTime().atZone(AppointmentsController.clientTimeZone).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm", Locale.ENGLISH))));
             }
         }
         return alist;
