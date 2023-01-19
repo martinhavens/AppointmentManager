@@ -2,7 +2,9 @@ package helper;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-
+/**
+ * A Class to enable an SQL database connection.
+ */
 public abstract class JDBC {
 
     private static final String protocol = "jdbc";
@@ -26,18 +28,13 @@ public abstract class JDBC {
         }
     }
 
+    /**
+     * Provides an interface to get the database connection.
+     * @return
+     */
     public static Connection getConnection(){
         return connection;
     }
 
-    public static void closeConnection() {
-        try{
-            connection.close();
-            System.out.println("Connection closed!");
-        }
-        catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
 
 }
