@@ -378,7 +378,6 @@ public class AppointmentsController implements Initializable {
             for (int i = 0; i < max; i++) {
                 tempA[i] = 0;
             }
-            System.out.println(tempA.length);
             for (int i = 0; i < N; i++) {
                 tempA[tempCustomers.get(i).getCustomerID() - 1] = 1;
             }
@@ -654,12 +653,9 @@ public class AppointmentsController implements Initializable {
             int[] tempA = new int[max];
             for (int i = 0; i < max; i++) {
                 tempA[i] = 0;
-                System.out.println("tempA["+i + "] "+ "="+tempA[i]);
             }
-            System.out.println(tempA.length);
             for (int i = 0; i < N; i++) {
                 tempA[tempAppointments.get(i).getAppointmentID() - 1] = 1;
-                System.out.println("tempA["+(tempAppointments.get(i).getAppointmentID() -1) + "] "+ "="+tempA[(tempAppointments.get(i).getAppointmentID()-1)]);
             }
             boolean set = true;
             for (int i = 0; i < max; i++) {
@@ -673,8 +669,6 @@ public class AppointmentsController implements Initializable {
                 aid_c = max + 1;
             }
         }
-        System.out.println(N);
-        System.out.println(tempAppointments);
         aAID.setText(Integer.toString(aid_c));
         dynamicLabel.setText("Adding an Appointment:");
         aContact.setItems(Contacts.getAllContactNames());

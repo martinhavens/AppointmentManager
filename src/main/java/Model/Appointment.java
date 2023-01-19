@@ -24,7 +24,6 @@ public class Appointment {
     int userID;
 
 
-
     public Appointment(Integer appointmentID, String title, String description, String location, int contactID, String type, LocalDateTime dateStart, LocalDateTime dateEnd, int customerID, int userID) {
         this.appointmentID = appointmentID;
         this.title = title;
