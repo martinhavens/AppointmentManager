@@ -4,7 +4,6 @@ import Model.Contact;
 import helper.JDBC;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -81,17 +80,4 @@ public abstract class Contacts {
         }
         return clist;
     }
-
-    public String getContactName(Integer contactID){
-        for (Contact C : Contact.allContacts){
-            if (C.getContactID() == contactID){
-                return C.getName();
-            }
-        }
-        return null;
-    }
-
-
-
-
 }

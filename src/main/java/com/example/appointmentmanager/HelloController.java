@@ -22,17 +22,36 @@ import java.util.Calendar;
 
 import static com.example.appointmentmanager.HelloApplication.window;
 
+/**
+ * The log-in form for the English case of the gui.
+ */
 public class HelloController {
 
+    /** a Button element of the gui implementation **/
     public TextField usernameTextField;
+    /** a TextField element of the gui implementation **/
     public TextField passwordTextField;
+    /** a Label element of the gui implementation **/
     public Label usernameLabel;
+    /** a Label element of the gui implementation **/
     public Label passwordLabel;
+    /** a Label element of the gui implementation **/
     public Label loginMainLabel;
+    /** an AnchorPane element of the gui implementation **/
     public AnchorPane anchorPane;
+
+    /**
+     * a File object to contain all of the attempted logins.
+     */
     public static File myObj = new File("./loginlog.txt");
+    /**
+     * A FileWriter object to append to the File object that contains all of the attempted logins.
+     */
     public static FileWriter fr;
 
+    /**
+     * A FileWriter object to append to the File object that contains all of the attempted logins.
+     */
     static {
         try {
             fr = new FileWriter(myObj, true);
@@ -41,12 +60,26 @@ public class HelloController {
         }
     }
 
+    /**
+     * A PrintWriter object to append to the File object that contains all of the attempted logins.
+     */
     public static PrintWriter pr = new PrintWriter(fr);
 
+    /**
+     * A function using the PrinterWriter object to append the String parameter into the File object that contains all
+     * of the attempted logins.
+     * @param s
+     */
     public void loginRecord(String s) {
         pr.println(s);
     }
 
+    /**
+     * A button onAction function that validates log-in attempt entries and records the appropriate log-in attempt
+     * result into the File object that holds all of the login attempts.
+     * @throws SQLException
+     * @throws IOException
+     */
     public void logInEN() throws SQLException, IOException {
         String sql = String.format("SELECT * FROM users WHERE User_Name = '%s';", usernameTextField.getText());
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
@@ -69,6 +102,9 @@ public class HelloController {
 
     }
 
+    /**
+     * A button onAction function that closes the entire program while at the log-in screen.
+     */
     public void exitApp() {
         pr.close();
         Stage stage;
@@ -77,6 +113,10 @@ public class HelloController {
         stage.close();
     }
 
+    /**
+     * A function that is called whenever a successful username and password combination is entered into the log-in form.
+     * @throws IOException
+     */
     public void openApts() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("appointments.fxml"));
         Scene scene2;

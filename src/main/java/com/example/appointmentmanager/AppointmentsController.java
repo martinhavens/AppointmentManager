@@ -12,7 +12,6 @@ import helper.JDBC;
 import helper.Monthly;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -21,9 +20,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,6 +30,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
+/**
+ * The controller class of the main gui form of ../resources/appointments.fxml
+ */
 public class AppointmentsController implements Initializable {
 
     /** a ZoneId of the current user's computer environment used for LocalDateTime operations **/
@@ -165,10 +165,15 @@ public class AppointmentsController implements Initializable {
     public TextField aUserID;
     /** a Label element of the gui implementation **/
     public Label dynamicLabel;
+    /** a ComboBox element of the gui implementation **/
     public ComboBox contactScheduleComboBox;
+    /** a TableView element of the gui implementation **/
     public TableView monthlyReportTableView;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn mMonth;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn mType;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn mNumber;
 
     public AppointmentsController() throws SQLException {
@@ -389,29 +394,6 @@ public class AppointmentsController implements Initializable {
                 cid_c = max + 1;
             }
         }
-//        else {
-//            int[] arr = new int[N + 1];
-//            for (int i=0; i<N; i++) {
-//                Customer tempCustomer = tempCustomers.get(i);
-//                arr[i] = tempCustomer.getCustomerID();
-//            }
-//            int j;
-//            int[] temp2 = new int[N + 1];
-//            for (j = 0; j <= N; j++) {
-//                temp2[j] = 0;
-//            }
-//
-//            for (j = 0; j < N; j++) {
-//                temp2[arr[j] - 1] = 1;
-//            }
-//
-//            int ans = 0;
-//            for (j = 0; j <= N; j++) {
-//                if (temp2[j] == 0)
-//                    ans = j + 1;
-//            }
-//            cid_c = ans;
-//        }
         cCID.setText(Integer.toString(cid_c));
         dynamicLabel.setText("Adding a Customer:");
         cCountry.setItems(Customers.getAllCountries());
@@ -693,32 +675,6 @@ public class AppointmentsController implements Initializable {
         }
         System.out.println(N);
         System.out.println(tempAppointments);
-//        if (N == 0) {
-//            aid_c = 1;
-//        } else {
-//            int[] arr = new int[N + 1];
-//            for (int i=0; i<N; i++) {
-//                Appointment tempAppointment = tempAppointments.get(i);
-//                arr[i] = tempAppointment.getAppointmentID();
-//            }
-//            int j;
-//            int[] temp2 = new int[N + 1];
-//            for (j = 0; j <= N; j++) {
-//                temp2[j] = 0;
-//            }
-//            System.out.println(arr);
-//            for (j = 0; j < N; j++) {
-//                System.out.println(arr[j]);
-//                temp2[arr[j] - 1] = 1;
-//            }
-//
-//            int ans = 0;
-//            for (j = 0; j <= N; j++) {
-//                if (temp2[j] == 0)
-//                    ans = j + 1;
-//            }
-//            aid_c = ans;
-//        }
         aAID.setText(Integer.toString(aid_c));
         dynamicLabel.setText("Adding an Appointment:");
         aContact.setItems(Contacts.getAllContactNames());
@@ -1100,7 +1056,7 @@ public class AppointmentsController implements Initializable {
     }
 
     /**
-     * A button onAction function that refreshes the monthly report tableview items, located at bottom right of the gui.
+     * A button onAction function that refreshes the items on the monthly-report tableview items, located at bottom right of the gui.
      * @throws SQLException
      */
     public void refreshMonthlyReport() throws SQLException {

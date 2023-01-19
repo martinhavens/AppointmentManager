@@ -7,28 +7,26 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
 import java.io.IOException;
-import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.Locale;
 
+/**
+ * The original application file that opens specific fxml depending on the user's computer system's language.
+ * The languages are English or French.
+ */
 public class HelloApplication extends Application {
-
+    /**
+     * The primary window for the gui application across fxml files.
+     */
     public static Stage window;
 
+    /**
+     * Determines the user's system language and opens the appropriate fxml file.
+     * @param stage
+     * @throws IOException
+     */
     @Override
     public void start(Stage stage) throws IOException {
-        ZoneId clientZoneID = ZoneId.systemDefault(); // America/New_York
-        String clientLanguage = Locale.getDefault().getLanguage(); // en
-        String clientTimeZone = Calendar.getInstance().getTimeZone().getDisplayName(); // Eastern Standard Time
-
-        System.out.println(clientZoneID);
-        System.out.println(clientLanguage);
-        System.out.println(clientTimeZone);
-
-
-
         if (Locale.getDefault().getLanguage().equals("en")){
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
             window = stage;
@@ -57,6 +55,8 @@ public class HelloApplication extends Application {
                 }
             });
             window.show();
+        } else {
+            System.out.println("No supported language found.");
         }
     }
 
