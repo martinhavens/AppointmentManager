@@ -2,6 +2,9 @@ package Model;
 
 import DBAccess.Customers;
 
+/**
+ * A class to create Customer objects
+ */
 public class Customer {
 
     Integer customerID;

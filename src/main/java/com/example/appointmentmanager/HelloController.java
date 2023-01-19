@@ -68,7 +68,7 @@ public class HelloController {
     /**
      * A function using the PrinterWriter object to append the String parameter into the File object that contains all
      * of the attempted logins.
-     * @param s
+     * @param s String to append into the File object of attempted logins
      */
     public void loginRecord(String s) {
         pr.println(s);

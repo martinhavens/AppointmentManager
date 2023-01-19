@@ -9,10 +9,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+/**
+ * A class to perform actions related to contacts.
+ */
 public abstract class Contacts {
 
+    /**
+     * A HashMap to retrieve the contact's name as a string given the contact's ID.
+     */
     public static HashMap<Integer, String> contactDictionary = setupDictionary(false);
+    /**
+     * A HashMap to retrieve the contact's ID as an ID given the contact's name as a String.
+     */
     public static HashMap<String, Integer> reverseContactDictionary = setupDictionary(true);
+
+    /**
+     * A function to initialize the Contacts class hashmaps
+     * @param reverse Determine whether the hashmap will require a string input or an integer input
+     * @return Returns a hashmap to retrieve the contact ID or contact name given the contact name or contact ID, respectively.
+     */
     public static HashMap setupDictionary(boolean reverse){
         HashMap contactDiction = new HashMap<>();
         try {
@@ -37,6 +52,11 @@ public abstract class Contacts {
         return contactDiction;
     }
 
+    /**
+     * A function to create contact objects from the database and allow the internal setupDictionary function to operate.
+     * @return Returns a list of all contacts to allow setupDictionary to iterate for all contacts.
+     * @throws SQLException
+     */
     public static ObservableList<Contact> getAllContacts() throws SQLException {
         ObservableList<Contact> clist = FXCollections.observableArrayList();
         try {
@@ -59,6 +79,10 @@ public abstract class Contacts {
         return clist;
     }
 
+    /**
+     * A function used to iterate through all contacts in the database and populate a combobox on the main gui interface.
+     * @return Returns an observablelist of strings to populate a combobox on the main gui interface.
+     */
     public static ObservableList<String> getAllContactNames() {
 
         ObservableList<String> clist = FXCollections.observableArrayList();

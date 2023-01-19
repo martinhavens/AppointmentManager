@@ -3,6 +3,9 @@ package Model;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ * A class to create Contact objects.
+ */
 public class Contact {
 
     public int getContactID() {

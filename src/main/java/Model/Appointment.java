@@ -6,6 +6,9 @@ import com.example.appointmentmanager.AppointmentsController;
 
 import java.time.LocalDateTime;
 
+/**
+ * A class to create Appointment objects
+ */
 public class Appointment {
     Integer appointmentID;
     String title;
