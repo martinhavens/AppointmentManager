@@ -38,7 +38,7 @@ public class HelloApplication extends Application {
             window.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent windowEvent) {
-                    System.out.println("Window Event handler works");
+                    System.out.println("Window Closed by User");
                     HelloController.pr.close();
                 }
             });
@@ -47,11 +47,12 @@ public class HelloApplication extends Application {
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-viewFR.fxml"));
             window = stage;
             Scene scene = new Scene(fxmlLoader.load(), 600, 400);
-            window.setTitle("Hello!");
+            window.setTitle("Bonjour!");
             window.setScene(scene);
             window.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent windowEvent) {
+                    System.out.println("Fenêtre fermée par l'utilisateur");
                     HelloController.pr.close();
                 }
             });

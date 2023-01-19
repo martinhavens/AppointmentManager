@@ -110,6 +110,5 @@ public class Appointments {
         Appointments.addAppointment(newAppointment);
     }
 
-    //public static int insertAppointment()
 
 }

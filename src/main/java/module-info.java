@@ -6,6 +6,7 @@ module com.example.appointmentmanager {
 
 
     opens com.example.appointmentmanager to javafx.fxml;
+    opens helper to javafx.base;
     exports Model;
     exports com.example.appointmentmanager;
 }

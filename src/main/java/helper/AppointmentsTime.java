@@ -47,13 +47,39 @@ public abstract class AppointmentsTime {
             if (rs.getInt("Appointment_ID") == a.getAppointmentID()){
                 continue;
             }
+            System.out.println(rs.getInt("Appointment_ID"));
             LocalDateTime start = rs.getTimestamp("Start").toLocalDateTime();
             LocalDateTime end = rs.getTimestamp("End").toLocalDateTime();
-            if (((a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && (a.getDateStart().isBefore(end) || a.getDateStart().isEqual(end))) || (a.getDateStart().isBefore(start) || a.getDateStart().isEqual(start)) && (a.getDateEnd().isBefore(end) || a.getDateStart().isEqual(end)) || (a.getDateStart().isBefore(start) || a.getDateStart().isEqual(start)) && (a.getDateEnd().isAfter(end) || a.getDateEnd().isEqual(end))){
+//            System.out.println(rs.getTimestamp("Start").toLocalDateTime());System.out.println();
+//            a.getDateStart().isBefore(start) || a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && ((a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end) || a.getDateEnd().isAfter(end)) && (a.getDateEnd().isAfter(start) && (a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end)))) || (a.getDateStart().isBefore(start) || a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && ((a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end) || a.getDateEnd().isAfter(end)) && (a.getDateStart().isBefore(end) && (a.getDateStart().isAfter(end) || a.getDateStart().isEqual(start))))            System.out.println(a.getDateStart().isBefore(start) );
+//            System.out.println("a.getDateStart().isAfter(start) " + a.getDateStart().isAfter(start));
+//            System.out.println("a.getDateStart().isEqual(start) "+ a.getDateStart().isEqual(start));
+//            System.out.println("a.getDateEnd().isBefore(end) "+ a.getDateEnd().isBefore(end));
+//            System.out.println("a.getDateEnd().isEqual(end) " +a.getDateEnd().isEqual(end));
+//            System.out.println("a.getDateEnd().isAfter(end) " +a.getDateEnd().isAfter(end));
+//            System.out.println("a.getDateEnd().isAfter(start) "+a.getDateEnd().isAfter(start));
+//            System.out.println("a.getDateStart().isBefore(end) "+a.getDateStart().isBefore(end));
+            System.out.println("a.getDateStart() "+a.getDateStart());
+            System.out.println("a.getDateEnd() "+a.getDateEnd());
+            System.out.println(start);
+            System.out.println(end);
+//            System.out.println("a.getDateStart().isAfter(end) "+a.getDateStart().isAfter(end));
+//            System.out.println((a.getDateStart().isBefore(start) || a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && ((a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end) || a.getDateEnd().isAfter(end)) && (a.getDateEnd().isAfter(start) )));
+//            System.out.println((a.getDateStart().isBefore(start) || a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && ((a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end) || a.getDateEnd().isAfter(end)) && (a.getDateStart().isBefore(end) )));
+            System.out.println(start.isBefore(a.getDateEnd()));
+            System.out.println(a.getDateStart().isBefore(end));
+//            System.out.println();
+//            System.out.println();
+//            (a.getDateStart().isBefore(start) || a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && ((a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end) || a.getDateEnd().isAfter(end)) && (a.getDateEnd().isAfter(start) && (a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end))));
+//            (a.getDateStart().isBefore(start) || a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && ((a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end) || a.getDateEnd().isAfter(end)) && (a.getDateStart().isBefore(end) && (a.getDateStart().isAfter(end) || a.getDateStart().isEqual(start))));
+//            if (((a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && (a.getDateStart().isBefore(end) || a.getDateStart().isEqual(end))) || ((a.getDateStart().isBefore(start) || a.getDateStart().isEqual(start)) && (a.getDateEnd().isAfter(end) || a.getDateEnd().isEqual(end))) || ((a.getDateStart().isBefore(start) || a.getDateStart().isEqual(start)) && (a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end)))){
+//            if (((a.getDateStart().isBefore(start) || a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && ((a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end) || a.getDateEnd().isAfter(end)) && a.getDateEnd().isAfter(start))) || ((a.getDateStart().isBefore(start) || a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && ((a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end) || a.getDateEnd().isAfter(end)) && a.getDateStart().isBefore(end)))){
+//            if ((((a.getDateStart().isBefore(start) || a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && ((a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end) || a.getDateEnd().isAfter(end)) && (a.getDateEnd().isAfter(start) && (a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end))))) || ((a.getDateStart().isBefore(start) || a.getDateStart().isAfter(start) || a.getDateStart().isEqual(start)) && ((a.getDateEnd().isBefore(end) || a.getDateEnd().isEqual(end) || a.getDateEnd().isAfter(end)) && (a.getDateStart().isBefore(end) && (a.getDateStart().isAfter(end) || a.getDateStart().isEqual(start))))))){
+//            start1.before(end2) && start2.before(end1)
+            if ((start.isBefore(a.getDateEnd()) && a.getDateStart().isBefore(end))) {
                 return true;
             }
         }
-
         return false;
     }
     public static HashMap<Integer, String> checkForAppointmentsOnLogin(Integer userID) throws SQLException {

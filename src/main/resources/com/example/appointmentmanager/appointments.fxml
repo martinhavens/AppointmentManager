@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="734.0" prefWidth="1017.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.appointmentmanager.AppointmentsController">
+<AnchorPane prefHeight="754.0" prefWidth="1017.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.appointmentmanager.AppointmentsController">
     <TableView fx:id="aTableView" layoutX="29.0" layoutY="414.0" prefHeight="209.0" prefWidth="967.0">
       <columns>
           <TableColumn fx:id="aTID" prefWidth="100.0" text="Appointment ID" />
@@ -66,11 +74,11 @@
     <Button fx:id="cancelCustomer" layoutX="933.0" layoutY="205.0" mnemonicParsing="false" onAction="#cancelCustomer" prefHeight="25.0" prefWidth="59.0" text="Cancel" />
     <Label layoutX="251.0" layoutY="275.0" text="Start:" />
     <Label layoutX="256.0" layoutY="308.0" text="End:" />
-    <RadioButton fx:id="monthlyFilter" layoutX="379.0" layoutY="639.0" mnemonicParsing="false" onAction="#appointmentsMonthly" text="month">
+    <RadioButton fx:id="monthlyFilter" layoutX="250.0" layoutY="639.0" mnemonicParsing="false" onAction="#appointmentsMonthly" text="month">
       <toggleGroup>
          <ToggleGroup fx:id="filterGroup" />
       </toggleGroup></RadioButton>
-    <RadioButton fx:id="weeklyFilter" layoutX="446.0" layoutY="639.0" mnemonicParsing="false" onAction="#appointmentsWeekly" text="week" toggleGroup="$filterGroup" />
+    <RadioButton fx:id="weeklyFilter" layoutX="317.0" layoutY="639.0" mnemonicParsing="false" onAction="#appointmentsWeekly" text="week" toggleGroup="$filterGroup" />
     <Button fx:id="modifyAppointment" layoutX="46.0" layoutY="666.0" mnemonicParsing="false" onAction="#modifyAppointment" text="Modify Appointment" />
     <Label fx:id="dynamicLabel" layoutX="721.0" layoutY="275.0" prefHeight="126.0" prefWidth="276.0" text="Select an Option:" wrapText="true">
         <font>
@@ -86,13 +94,27 @@
    <DatePicker fx:id="startDatePick" layoutX="281.0" layoutY="271.0" prefHeight="25.0" prefWidth="136.0" promptText="Date / Local Time" />
    <ComboBox fx:id="startTimePick" layoutX="421.0" layoutY="271.0" prefHeight="25.0" prefWidth="127.0" />
    <ComboBox fx:id="endTimePick" layoutX="421.0" layoutY="304.0" prefHeight="25.0" prefWidth="127.0" />
-   <Button fx:id="filterHigher" layoutX="516.0" layoutY="635.0" mnemonicParsing="false" text="&gt;" />
-   <Button fx:id="filterLower" layoutX="343.0" layoutY="635.0" mnemonicParsing="false" text="&lt;" />
-   <Button layoutX="421.0" layoutY="696.0" mnemonicParsing="false" onAction="#clearFilter" text="Clear" />
-   <Label layoutX="337.0" layoutY="670.0" text="Frame of Reference:" />
-   <Label fx:id="referenceFrame" layoutX="450.0" layoutY="670.0" prefHeight="18.0" prefWidth="150.0" text="All" />
-   <Label layoutX="578.0" layoutY="639.0" text="Current Time Zone:" />
-   <Label layoutX="591.0" layoutY="662.0" text="Clinic time Zone:" />
-   <Label fx:id="clinicTimeZoneLabel" layoutX="700.0" layoutY="662.0" text="EST -5:00" />
-   <Label fx:id="currentTimeZoneLabel" layoutX="700.0" layoutY="639.0" text="Null" />
+   <Button fx:id="filterHigher" layoutX="387.0" layoutY="635.0" mnemonicParsing="false" text="&gt;" />
+   <Button fx:id="filterLower" layoutX="214.0" layoutY="635.0" mnemonicParsing="false" text="&lt;" />
+   <Button layoutX="292.0" layoutY="696.0" mnemonicParsing="false" onAction="#clearFilter" text="Clear" />
+   <Label layoutX="208.0" layoutY="670.0" text="Frame of Reference:" />
+   <Label fx:id="referenceFrame" layoutX="321.0" layoutY="670.0" prefHeight="18.0" prefWidth="150.0" text="All" />
+   <Label layoutX="466.0" layoutY="631.0" text="Current Time Zone:" />
+   <Label layoutX="479.0" layoutY="654.0" text="Clinic time Zone:" />
+   <Label fx:id="clinicTimeZoneLabel" layoutX="588.0" layoutY="655.0" text="EST -5:00" />
+   <Label fx:id="currentTimeZoneLabel" layoutX="588.0" layoutY="631.0" text="Null" />
+   <ComboBox fx:id="contactScheduleComboBox" layoutX="723.0" layoutY="635.0" prefHeight="25.0" prefWidth="137.0" />
+   <Button layoutX="865.0" layoutY="636.0" mnemonicParsing="false" onAction="#viewContactSchedule" text="View Contact Schedule" />
+   <TableView fx:id="monthlyReportTableView" layoutX="466.0" layoutY="674.0" prefHeight="71.0" prefWidth="535.0">
+     <columns>
+       <TableColumn fx:id="mMonth" prefWidth="124.0" text="Month" />
+       <TableColumn fx:id="mType" prefWidth="242.0" text="Type of Appointment" />
+         <TableColumn fx:id="mNumber" prefWidth="168.0" text="Number of Appointments" />
+     </columns>
+   </TableView>
+   <Button layoutX="393.0" layoutY="675.0" mnemonicParsing="false" onAction="#refreshMonthlyReport" prefHeight="71.0" prefWidth="69.0" text="Refresh Monthly Report" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
+      <font>
+         <Font size="11.0" />
+      </font>
+   </Button>
 </AnchorPane>

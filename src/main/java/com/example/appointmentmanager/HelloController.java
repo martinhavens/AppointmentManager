@@ -80,7 +80,7 @@ public class HelloController {
     public void openApts() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("appointments.fxml"));
         Scene scene2;
-        scene2 = new Scene(fxmlLoader.load(), 1017, 734);
+        scene2 = new Scene(fxmlLoader.load(), 1017, 754);
         window.setScene(scene2);
     }
 }

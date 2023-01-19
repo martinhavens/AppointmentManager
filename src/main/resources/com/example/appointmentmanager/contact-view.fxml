@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="336.0" prefWidth="721.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.appointmentmanager.contactController">
+   <children>
+      <TableView fx:id="contactTableView" layoutX="24.0" layoutY="20.0" prefHeight="263.0" prefWidth="682.0">
+        <columns>
+          <TableColumn fx:id="cAID" prefWidth="75.0" text="App... ID" />
+          <TableColumn fx:id="cTitle" prefWidth="97.0" text="Title" />
+            <TableColumn fx:id="cType" prefWidth="85.0" text="Type" />
+            <TableColumn fx:id="cDescription" prefWidth="114.0" text="Description" />
+            <TableColumn fx:id="cStart" prefWidth="105.0" text="Start" />
+            <TableColumn fx:id="cEnd" prefWidth="109.0" text="End" />
+            <TableColumn fx:id="cCID" prefWidth="96.0" text="Customer ID" />
+        </columns>
+      </TableView>
+      <Button layoutX="343.0" layoutY="297.0" mnemonicParsing="false" onAction="#exitApp" text="Exit" />
+   </children>
+</AnchorPane>

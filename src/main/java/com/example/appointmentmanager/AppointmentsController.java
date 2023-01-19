@@ -9,13 +9,20 @@ import Model.Customer;
 import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import helper.AlertBox;
 import helper.JDBC;
+import helper.Monthly;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.sql.PreparedStatement;
@@ -27,75 +34,152 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 
 public class AppointmentsController implements Initializable {
+
+    /** a ZoneId of the current user's computer environment used for LocalDateTime operations **/
+    public static ZoneId clientTimeZone = ZoneId.of(Calendar.getInstance().getTimeZone().getID());
+    /** a ZoneId of the appointment office used for LocalDateTime operations to Eastern Time**/
+    public static ZoneId clinicTimeZone = ZoneId.of("America/New_York");
+    /** An Integer for performing checks against the database for upcoming appointments for the user **/
+    public static Integer userID;
+    /** an Integer to track the current tableview index being modified across different method calls and scopes **/
+    Integer selectedIndex;
+    /** an observable list to track all the appointments and maintain a tableview **/
+    ObservableList<Appointment> tempAppointments = Appointments.getAllAppointments();
+    /** an observable list to track all the customers and maintain a tableview **/
+    ObservableList<Customer> tempCustomers = Customers.getAllCustomers();
+    /** an observable list to contain divisions while filtering occurs from country selection **/
+    ObservableList<String> divisions = FXCollections.observableArrayList();
+
+    /** a Button element of the gui implementation **/
     public TextField aAID;
+    /** a Button element of the gui implementation **/
     public Button saveAppointment;
+    /** a Button element of the gui implementation **/
     public Button cancelAppointment;
+    /** a Button element of the gui implementation **/
     public Button saveCustomer;
+    /** a Button element of the gui implementation **/
     public Button cancelCustomer;
+    /** a TextField element of the gui implementation **/
     public TextField cCID;
+    /** a TextField element of the gui implementation **/
     public TextField cName;
+    /** a TextField element of the gui implementation **/
     public TextField cAddress;
+    /** a TextField element of the gui implementation **/
     public TextField cPostal;
+    /** a TextField element of the gui implementation **/
     public TextField cPhone;
+    /** a ComboBox element of the gui implementation **/
     public ComboBox cDivision;
+    /** a ComboBox element of the gui implementation **/
     @FXML
     public ComboBox cCountry;
+    /** a Button element of the gui implementation **/
     public Button modifyCustomer;
+    /** a Button element of the gui implementation **/
     public Button modifyAppointment;
+    /** a Button element of the gui implementation **/
     public Button addAppointment;
+    /** a Button element of the gui implementation **/
     public Button addCustomer;
+    /** a Button element of the gui implementation **/
     public Button deleteAppointment;
+    /** a Button element of the gui implementation **/
     public Button deleteCustomer;
+    /** a DatePicker element of the gui implementation **/
     public DatePicker endDatePick;
+    /** a DatePicker element of the gui implementation **/
     public DatePicker startDatePick;
+    /** a ComboBox element of the gui implementation **/
     public ComboBox startTimePick;
+    /** a ComboBox element of the gui implementation **/
     public ComboBox endTimePick;
+    /** a RadioButton element of the gui implementation **/
     public RadioButton monthlyFilter;
+    /** a RadioButton element of the gui implementation **/
     public RadioButton weeklyFilter;
+    /** a Button element of the gui implementation **/
     public Button filterHigher;
+    /** a Button element of the gui implementation **/
     public Button filterLower;
+    /** a ToggleGroup element of the gui implementation **/
     public ToggleGroup filterGroup;
+    /** a Label element of the gui implementation **/
     public Label referenceFrame;
-    public static ZoneId clientTimeZone = ZoneId.of(Calendar.getInstance().getTimeZone().getID()); // Eastern Standard Time
-    public static ZoneId clinicTimeZone = ZoneId.of("America/New_York"); // Eastern Standard Time
+    /** a Label element of the gui implementation **/
     public Label currentTimeZoneLabel;
+    /** a Label element of the gui implementation **/
     public Label clinicTimeZoneLabel;
-    public static Integer userID;
-    Integer selectedIndex;
-    ObservableList<Appointment> tempAppointments = Appointments.getAllAppointments();
-    ObservableList<Customer> tempCustomers = Customers.getAllCustomers();
-    ObservableList<String> divisions = FXCollections.observableArrayList();
+    /** a TableView element of the gui implementation **/
     public TableView<Appointment> aTableView;
+    /** a TableView element of the gui implementation **/
     public TableView<Customer> cTableView;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Appointment, Integer> aTID;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Appointment, String>  aTTitle;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Appointment, String>  aTDesc;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Appointment, String>  aTLocation;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Contact, String>  aTContactID;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Appointment, String>  aTType;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Appointment, String>  aTStart;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Appointment, String>  aTEnd;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Appointment, Integer>  aTCID;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Appointment, Integer>  atUID;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Customer, Integer> cTID;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Customer, String> cTName;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Customer, String> cTAddress;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Customer, String> cTPostalCode;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Customer, String> cTPhoneNumber;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn<Customer, Integer> cTDivision;
+    /** a TableColumn element of the gui implementation **/
     public TableColumn cTCountry;
+    /** a TextField element of the gui implementation **/
     public TextField aTitle;
+    /** a TextField element of the gui implementation **/
     public TextField aDescription;
+    /** a TextField element of the gui implementation **/
     public TextField aLocation;
+    /** a ComboBox element of the gui implementation **/
     public ComboBox<String> aContact;
+    /** a TextField element of the gui implementation **/
     public TextField aType;
+    /** a TextField element of the gui implementation **/
     public TextField aCID;
+    /** a TextField element of the gui implementation **/
     public TextField aUserID;
+    /** a Label element of the gui implementation **/
     public Label dynamicLabel;
+    public ComboBox contactScheduleComboBox;
+    public TableView monthlyReportTableView;
+    public TableColumn mMonth;
+    public TableColumn mType;
+    public TableColumn mNumber;
 
     public AppointmentsController() throws SQLException {
     }
 
+    /**
+     * Initialize tableviews and enables or disables the relevant main form objects.
+     * Lambda with listeners to enable modify and delete buttons when a tableview element is selected.
+     * @param url is a default javafx parameter
+     * @param resourceBundle is a default javafx parameter
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
         aTID.setCellValueFactory(new PropertyValueFactory<>("appointmentID"));
@@ -115,16 +199,27 @@ public class AppointmentsController implements Initializable {
         cTPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
         cTDivision.setCellValueFactory(new PropertyValueFactory<>("division"));
         cTCountry.setCellValueFactory(new PropertyValueFactory<>("country"));
+        currentTimeZoneLabel.setText(String.valueOf(clientTimeZone));
+        clinicTimeZoneLabel.setText(String.valueOf(clinicTimeZone));
+
         try {
             aTableView.setItems(Appointments.getAllAppointments());
             cTableView.setItems(Customers.getAllCustomers());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        contactScheduleComboBox.setItems(Contacts.getAllContactNames());
+
         appointmentDisable();
         customerDisable();
+        filterLower.setDisable(true);
+        filterHigher.setDisable(true);
         modifyCustomer.setDisable(true);
         deleteCustomer.setDisable(true);
+        modifyAppointment.setDisable(true);
+        deleteAppointment.setDisable(true);
+
         cTableView.getSelectionModel().selectedIndexProperty().addListener((obs, oldV, newV) -> {
             if (newV != null){
                 modifyCustomer.setDisable(false);
@@ -135,8 +230,14 @@ public class AppointmentsController implements Initializable {
                 deleteCustomer.setDisable(true);
             }
         });
-        modifyAppointment.setDisable(true);
-        deleteAppointment.setDisable(true);
+
+        try {
+            tempCustomers = Customers.getAllCustomers();
+            tempAppointments = Appointments.getAllAppointments();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
         aTableView.getSelectionModel().selectedIndexProperty().addListener((obse, oldVa, newVa) -> {
             if (newVa != null){
                 modifyAppointment.setDisable(false);
@@ -147,8 +248,7 @@ public class AppointmentsController implements Initializable {
                 deleteAppointment.setDisable(true);
             }
         });
-        filterLower.setDisable(true);
-        filterHigher.setDisable(true);
+
         try {
             Customers.getAllDivisions();
             Customers.getAllCountries();
@@ -156,8 +256,6 @@ public class AppointmentsController implements Initializable {
             throw new RuntimeException(e);
         }
 
-        currentTimeZoneLabel.setText(String.valueOf(clientTimeZone));
-        clinicTimeZoneLabel.setText(String.valueOf(clinicTimeZone));
         try {
             StringBuilder alert = new StringBuilder();
             HashMap loginList = AppointmentsTime.checkForAppointmentsOnLogin(userID);
@@ -175,6 +273,12 @@ public class AppointmentsController implements Initializable {
             throwables.printStackTrace();
         }
     }
+
+    /**
+     * A button onAction function that populates and enables all relevant gui field to modify a customer.
+     * And changes the GUI dynamic text.
+     * @throws SQLException
+     */
     public void modifyCustomer() throws SQLException {
         if (cTableView.getSelectionModel().isEmpty()){
             AlertBox.display("Error Message", "No Customer is Selected!");
@@ -203,8 +307,11 @@ public class AppointmentsController implements Initializable {
             cDivision.getSelectionModel().selectNext();
         }
         customerEnable();
-
     }
+
+    /**
+     * A helper function to enable all relevant customer fields
+     */
     public void customerEnable(){
         cName.setDisable(false);
         cAddress.setDisable(false);
@@ -215,6 +322,10 @@ public class AppointmentsController implements Initializable {
         saveCustomer.setDisable(false);
         cancelCustomer.setDisable(false);
     }
+
+    /**
+     * A helper function to disable all relevant customer fields
+     */
     public void customerDisable(){
         cName.setDisable(true);
         cCID.setDisable(true);
@@ -236,37 +347,71 @@ public class AppointmentsController implements Initializable {
         deleteCustomer.setDisable(true);
         addCustomer.setDisable(false);
     }
+
+    /**
+     * Enables the relevant customer fields, determines the new customer ID, and changes the GUI dynamic text.
+     * @throws SQLException
+     */
     public void addCustomer() throws SQLException {
         addAppointment.setDisable(true);
         customerDisable();
         customerEnable();
-        int cid_c;
+        int cid_c = 0;
+        int max = 0;
         int N = tempCustomers.size();
         if (N == 0) {
             cid_c = 1;
         } else {
-            int[] arr = new int[N + 1];
-            for (int i=0; i<N; i++) {
+            for (int i = 0; i < N; i++) {
                 Customer tempCustomer = tempCustomers.get(i);
-                arr[i] = tempCustomer.getCustomerID();
-            }
-            int j;
-            int[] temp2 = new int[N + 1];
-            for (j = 0; j <= N; j++) {
-                temp2[j] = 0;
+                if (tempCustomer.getCustomerID() > max) {
+                    max = tempCustomer.getCustomerID();
+                }
             }
 
-            for (j = 0; j < N; j++) {
-                temp2[arr[j] - 1] = 1;
+            int[] tempA = new int[max];
+            for (int i = 0; i < max; i++) {
+                tempA[i] = 0;
             }
-
-            int ans = 0;
-            for (j = 0; j <= N; j++) {
-                if (temp2[j] == 0)
-                    ans = j + 1;
+            System.out.println(tempA.length);
+            for (int i = 0; i < N; i++) {
+                tempA[tempCustomers.get(i).getCustomerID() - 1] = 1;
             }
-            cid_c = ans;
+            boolean set = true;
+            for (int i = 0; i < max; i++) {
+                if (tempA[i] == 0){
+                    cid_c = i + 1;
+                    set = false;
+                    break;
+                }
+            }
+            if (set){
+                cid_c = max + 1;
+            }
         }
+//        else {
+//            int[] arr = new int[N + 1];
+//            for (int i=0; i<N; i++) {
+//                Customer tempCustomer = tempCustomers.get(i);
+//                arr[i] = tempCustomer.getCustomerID();
+//            }
+//            int j;
+//            int[] temp2 = new int[N + 1];
+//            for (j = 0; j <= N; j++) {
+//                temp2[j] = 0;
+//            }
+//
+//            for (j = 0; j < N; j++) {
+//                temp2[arr[j] - 1] = 1;
+//            }
+//
+//            int ans = 0;
+//            for (j = 0; j <= N; j++) {
+//                if (temp2[j] == 0)
+//                    ans = j + 1;
+//            }
+//            cid_c = ans;
+//        }
         cCID.setText(Integer.toString(cid_c));
         dynamicLabel.setText("Adding a Customer:");
         cCountry.setItems(Customers.getAllCountries());
@@ -275,6 +420,12 @@ public class AppointmentsController implements Initializable {
         modifyCustomer.setDisable(true);
         deleteCustomer.setDisable(true);
     }
+
+    /**
+     * A button onAction function call which validates customer field inputs,
+     * creates or modifies a customer depending on the dynamic label text, and adds to or updates the tableview.
+     * @throws SQLException
+     */
     public void createCustomer() throws SQLException {
         Integer ID;
         String name;
@@ -342,6 +493,11 @@ public class AppointmentsController implements Initializable {
         customerDisable();
         dynamicLabel.setText("Select an Option:");
     }
+
+    /**
+     * A button onAction call that disables all relevant fields, and resets the GUI dynamic label text to default.
+     * @throws SQLException
+     */
     public void cancelCustomer() throws SQLException {
         addAppointment.setDisable(false);
         divisions = Customers.getAllDivisions();
@@ -359,6 +515,12 @@ public class AppointmentsController implements Initializable {
         deleteCustomer.setDisable(true);
         dynamicLabel.setText("Select an Option:");
     }
+
+    /**
+     * A button onAction event that verifies a tableview object is selection, calls a deleteCustomer helper
+     * function externally, and displays the result of the deletion, before updating the tableview if needed.
+     * @throws SQLException
+     */
     public void deleteCustomer() throws SQLException {
         if (!cTableView.getSelectionModel().isEmpty()) {
             if (Customers.deleteCustomer(Customers.getAllCustomers().get(cTableView.getSelectionModel().getSelectedIndex()))){
@@ -371,6 +533,12 @@ public class AppointmentsController implements Initializable {
         cTableView.setItems(Customers.getAllCustomers());
         tempCustomers = Customers.getAllCustomers();
     }
+
+    /**
+     * A combobox onAction function call that filters the division combobox items based on whichever country
+     * is selected from the country combobox.
+     * @throws SQLException
+     */
     public void filterDivisions() throws SQLException {
         divisions.clear();
         Integer countryInt = Customers.countriesMap.get(cCountry.getSelectionModel().getSelectedItem());
@@ -387,6 +555,11 @@ public class AppointmentsController implements Initializable {
         }
         cDivision.setItems(divisions);
     }
+
+    /**
+     * A button onAction function that populates and enables all relevant gui field to modify an appointment.
+     * And changes the GUI dynamic text.
+     */
     public void modifyAppointment() {
         if (aTableView.getSelectionModel().isEmpty()){
             AlertBox.display("Error Message", "No Appointment is Selected!");
@@ -417,6 +590,10 @@ public class AppointmentsController implements Initializable {
         addAppointment.setDisable(true);
         deleteAppointment.setDisable(true);
     }
+
+    /**
+     * A helper function to enable all relevant appointment fields
+     */
     public void appointmentEnable(){
         aTitle.setDisable(false);
         aDescription.setDisable(false);
@@ -432,6 +609,10 @@ public class AppointmentsController implements Initializable {
         saveAppointment.setDisable(false);
         cancelAppointment.setDisable(false);
     }
+
+    /**
+     * A helper function to disable all relevant appointment fields
+     */
     public void appointmentDisable(){
         dynamicLabel.setText("Select an Option:");
         selectedIndex = null;
@@ -467,37 +648,77 @@ public class AppointmentsController implements Initializable {
         deleteAppointment.setDisable(false);
         modifyAppointment.setDisable(false);
     }
+
+    /**
+     * Enables the relevant appointment fields, determines the new appointment ID, and changes the GUI dynamic text.
+     */
     public void addAppointment() {
         addCustomer.setDisable(true);
         appointmentDisable();
         appointmentEnable();
-        int aid_c;
+        int max = 0;
+        int aid_c = 0;
         int N = tempAppointments.size();
-        if (N == 0) {
+        if (N == 0){
             aid_c = 1;
         } else {
-            int[] arr = new int[N + 1];
-            for (int i=0; i<N; i++) {
+            for (int i = 0; i < N; i++) {
                 Appointment tempAppointment = tempAppointments.get(i);
-                arr[i] = tempAppointment.getAppointmentID();
-            }
-            int j;
-            int[] temp2 = new int[N + 1];
-            for (j = 0; j <= N; j++) {
-                temp2[j] = 0;
+                if (tempAppointment.getAppointmentID() > max) {
+                    max = tempAppointment.getAppointmentID();
+                }
             }
 
-            for (j = 0; j < N; j++) {
-                temp2[arr[j] - 1] = 1;
+            int[] tempA = new int[max];
+            for (int i = 0; i < max; i++) {
+                tempA[i] = 0;
+                System.out.println("tempA["+i + "] "+ "="+tempA[i]);
             }
-
-            int ans = 0;
-            for (j = 0; j <= N; j++) {
-                if (temp2[j] == 0)
-                    ans = j + 1;
+            System.out.println(tempA.length);
+            for (int i = 0; i < N; i++) {
+                tempA[tempAppointments.get(i).getAppointmentID() - 1] = 1;
+                System.out.println("tempA["+(tempAppointments.get(i).getAppointmentID() -1) + "] "+ "="+tempA[(tempAppointments.get(i).getAppointmentID()-1)]);
             }
-            aid_c = ans;
+            boolean set = true;
+            for (int i = 0; i < max; i++) {
+                if (tempA[i] == 0){
+                    aid_c = i + 1;
+                    set = false;
+                    break;
+                }
+            }
+            if (set){
+                aid_c = max + 1;
+            }
         }
+        System.out.println(N);
+        System.out.println(tempAppointments);
+//        if (N == 0) {
+//            aid_c = 1;
+//        } else {
+//            int[] arr = new int[N + 1];
+//            for (int i=0; i<N; i++) {
+//                Appointment tempAppointment = tempAppointments.get(i);
+//                arr[i] = tempAppointment.getAppointmentID();
+//            }
+//            int j;
+//            int[] temp2 = new int[N + 1];
+//            for (j = 0; j <= N; j++) {
+//                temp2[j] = 0;
+//            }
+//            System.out.println(arr);
+//            for (j = 0; j < N; j++) {
+//                System.out.println(arr[j]);
+//                temp2[arr[j] - 1] = 1;
+//            }
+//
+//            int ans = 0;
+//            for (j = 0; j <= N; j++) {
+//                if (temp2[j] == 0)
+//                    ans = j + 1;
+//            }
+//            aid_c = ans;
+//        }
         aAID.setText(Integer.toString(aid_c));
         dynamicLabel.setText("Adding an Appointment:");
         aContact.setItems(Contacts.getAllContactNames());
@@ -507,6 +728,12 @@ public class AppointmentsController implements Initializable {
         modifyAppointment.setDisable(true);
         deleteAppointment.setDisable(true);
     }
+
+    /**
+     * A button onAction function call which validates appointment field inputs,
+     * creates or modifies a appointment depending on the dynamic label text, and adds to or updates the tableview.
+     * @throws SQLException
+     */
     public void createAppointment() throws SQLException {
         Integer ID;
         String title;
@@ -560,6 +787,20 @@ public class AppointmentsController implements Initializable {
             catch (NumberFormatException nfe) {
                 AlertBox.display("Error Message", "Type is Invalid!"); return; }
 
+        try { customerID = Integer.parseInt(aCID.getText()); }
+        catch (NumberFormatException nfe) {
+            AlertBox.display("Error Message", "Customer ID is Invalid!"); return; }
+        boolean cIDVALID = false;
+        for (Customer c : tempCustomers) {
+            if (c.getCustomerID() == Integer.parseInt(aCID.getText())) {
+                cIDVALID = true;
+            }
+        }
+        if (!cIDVALID) {
+            AlertBox.display("Error Message", "Enter a valid customer ID from the table above!"); return; }
+
+
+
         dateStart = LocalDateTime.of(startDatePick.getValue(), LocalTime.parse(startTimePick.getValue().toString())).atZone(clientTimeZone);
         dateEnd = LocalDateTime.of(endDatePick.getValue(), LocalTime.parse(endTimePick.getValue().toString())).atZone(clientTimeZone);
 
@@ -569,13 +810,18 @@ public class AppointmentsController implements Initializable {
             AlertBox.display("Error Message", "The office does not accept weekend appointments!"); return; }
         if (dateStart.withZoneSameInstant(clinicTimeZone).getHour() < 8 || dateStart.withZoneSameInstant(clinicTimeZone).getHour() > 22){
             AlertBox.display("Error Message", "The office doesn't schedule outside of 8AM-5PM EST!"); return; }
+        if (dateStart.isAfter(dateEnd) || dateStart.isEqual(dateEnd)){
+            AlertBox.display("Error Message", "End must be after the Start"); return; }
 
-        try { customerID = Integer.parseInt(aCID.getText()); }
-            catch (NumberFormatException nfe) {
-                AlertBox.display("Error Message", "Customer ID is Invalid!"); return; }
         try { userID = Integer.parseInt(aUserID.getText()); }
             catch (NumberFormatException nfe) {
                 AlertBox.display("Error Message", "User ID is Invalid!"); return; }
+
+        String sql = String.format("SELECT * FROM users WHERE User_ID ='%d';", userID);
+        PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()){ } else {
+            AlertBox.display("Error Message", "Enter a valid User ID!"); return; }
 
         Appointment c = null;
         if (dynamicLabel.getText().equals("Adding an Appointment:")){
@@ -612,6 +858,10 @@ public class AppointmentsController implements Initializable {
         tempAppointments = Appointments.getAllAppointments();
         appointmentDisable();
     }
+
+    /**
+     * A button onAction call that disables all relevant fields, and resets the GUI dynamic label text to default.
+     */
     public void cancelAppointment() {
         addCustomer.setDisable(false);
         appointmentDisable();
@@ -619,9 +869,16 @@ public class AppointmentsController implements Initializable {
         deleteAppointment.setDisable(true);
         aTableView.getSelectionModel().clearSelection();
     }
+
+    /**
+     * A button onAction event that verifies a tableview object is selection, calls a deleteAppointment helper
+     * function externally, and displays the result of the deletion, before updating the tableview if needed.
+     * @throws SQLException
+     */
     public void deleteAppointment() throws SQLException {
             if (!aTableView.getSelectionModel().isEmpty()) {
                     if (Appointments.deleteAppointment(Appointments.getAllAppointments().get(aTableView.getSelectionModel().getSelectedIndex()))){
+                        aTableView.getSelectionModel().clearSelection();
                         AlertBox.display("Alert", "Appointment was successfully deleted.");
                     }
                     else {
@@ -634,6 +891,14 @@ public class AppointmentsController implements Initializable {
             aTableView.setItems(Appointments.getAllAppointments());
             tempAppointments = Appointments.getAllAppointments();
     }
+
+    /**
+     * A radiobutton onAction function that enables the relevant GUI elements, determines the appointment current in the
+     * database with the earliest calendar date, and sets the initial appointment filter from the earliest appointment
+     * date to one month in the future. And sets the appropriate function calls to the filter advancement buttons via
+     * lambda functions.
+     * @throws SQLException
+     */
     public void appointmentsMonthly() throws SQLException {
         customerDisable();
         appointmentDisable();
@@ -665,6 +930,14 @@ public class AppointmentsController implements Initializable {
         filterLower.setOnAction(e -> filterLowerMonth());
         filterHigher.setOnAction(e -> filterHigherMonth());
     }
+
+    /**
+     * A radiobutton onAction function that enables the relevant GUI elements, determines the appointment current in the
+     * database with the earliest calendar date, and sets the initial appointment filter from the earliest appointment
+     * date to one week in the future. And sets the appropriate function calls to the filter advancement buttons via
+     * lambda functions.
+     * @throws SQLException
+     */
     public void appointmentsWeekly() throws SQLException {
         customerDisable();
         appointmentDisable();
@@ -698,6 +971,11 @@ public class AppointmentsController implements Initializable {
         filterLower.setOnAction(e -> filterLowerWeek());
         filterHigher.setOnAction(e -> filterHigherWeek());
     }
+
+    /**
+     * A button onAction function that gets the current filter reference date and advances the filter forward one month,
+     * afterwards updating the tableview.
+     */
     public void filterHigherMonth() {
         referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusMonths(1)));
         ObservableList tempItems = FXCollections.observableArrayList();
@@ -712,6 +990,11 @@ public class AppointmentsController implements Initializable {
             aTableView.setItems(tempItems);
         }
     }
+
+    /**
+     * A button onAction function that gets the current filter reference date and advances the filter backwards one month,
+     * afterwards updating the tableview.
+     */
     public void filterLowerMonth() {
         referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusMonths(-1)));
         ObservableList tempItems = FXCollections.observableArrayList();
@@ -761,5 +1044,60 @@ public class AppointmentsController implements Initializable {
         referenceFrame.setText("All");
         filterLower.setDisable(true);
         filterHigher.setDisable(true);
+    }
+
+    public void viewContactSchedule() throws SQLException, IOException {
+        if (contactScheduleComboBox.getSelectionModel().isEmpty()){
+            AlertBox.display("Error!", "No contact has been selected!");
+            return;
+        }
+        String tempContact = (String) contactScheduleComboBox.getSelectionModel().getSelectedItem();
+        String sql = String.format("SELECT * from appointments WHERE Contact_ID='%d';", Contacts.reverseContactDictionary.get(tempContact));
+        PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        ObservableList tempList = FXCollections.observableArrayList();
+        while (rs.next()) {
+            Integer app_id = rs.getInt("Appointment_ID");
+            String title = rs.getString("Title");
+            String desc = rs.getString("Description");
+            String location = rs.getString("Location");
+            int contactID = rs.getInt("Contact_ID");
+            String type = rs.getString("Type");
+            LocalDateTime dateStart = rs.getTimestamp("Start").toLocalDateTime().atZone(AppointmentsController.clientTimeZone).toLocalDateTime();
+            LocalDateTime dateEnd = rs.getTimestamp("End").toLocalDateTime().atZone(AppointmentsController.clientTimeZone).toLocalDateTime();
+            int customerID = rs.getInt("Customer_ID");
+            int userID = rs.getInt("User_ID");
+            Appointment c = new Appointment(app_id, title, desc, location, contactID, type, dateStart, dateEnd, customerID, userID);
+            tempList.add(c);
+        }
+        contactController.contactAppointments = tempList;
+        Parent root;
+        root = FXMLLoader.load(HelloApplication.class.getResource("contact-view.fxml"));
+        Stage stage = new Stage();
+        stage.setTitle(String.format("Viewing Schedule for %s", tempContact));
+        stage.setScene(new Scene(root, 721, 336));
+        stage.show();
+    }
+
+    public void refreshMonthlyReport() throws SQLException {
+        for (String s : Monthly.numberOfMap.keySet()){
+            Monthly.numberOfMap.put(s, 0);
+        }
+        ObservableList tempList = FXCollections.observableArrayList();
+
+        for (Appointment a : Appointments.getAllAppointments()){
+            String month = a.getDateStart().getMonth().toString();
+            String type = a.getType();
+            if (Monthly.numberOfMap.get(month+type) == null){
+                tempList.add(new Monthly(month, type));
+            }
+            else {
+                new Monthly(month, type);
+            }
+        }
+        mMonth.setCellValueFactory(new PropertyValueFactory<>("month"));
+        mType.setCellValueFactory(new PropertyValueFactory<>("type"));
+        mNumber.setCellValueFactory(new PropertyValueFactory<>("numberOf"));
+        monthlyReportTableView.setItems(tempList);
     }
 }
