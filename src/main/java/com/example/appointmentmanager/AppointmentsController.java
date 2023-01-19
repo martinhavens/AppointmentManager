@@ -1009,6 +1009,11 @@ public class AppointmentsController implements Initializable {
             aTableView.setItems(tempItems);
         }
     }
+
+    /**
+     * A button onAction function that gets the current filter reference date and advances the filter forwards one week,
+     * afterwards updating the tableview.
+     */
     public void filterHigherWeek() {
         referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusDays(7)));
         ObservableList tempItems = FXCollections.observableArrayList();
@@ -1023,6 +1028,11 @@ public class AppointmentsController implements Initializable {
             aTableView.setItems(tempItems);
         }
     }
+
+    /**
+     * A button onAction function that gets the current filter reference date and advances the filter forward one week,
+     * afterwards updating the tableview.
+     */
     public void filterLowerWeek() {
         referenceFrame.setText(String.valueOf(LocalDate.parse(referenceFrame.getText()).plusDays(-7)));
         ObservableList tempItems = FXCollections.observableArrayList();
@@ -1037,6 +1047,10 @@ public class AppointmentsController implements Initializable {
             aTableView.setItems(tempItems);
         }
     }
+
+    /**
+     * A button onAcion function that clears the filter reference date, and resets the tableview to show all appointments.
+     */
     public void clearFilter() {
         weeklyFilter.setSelected(false);
         monthlyFilter.setSelected(false);
@@ -1046,6 +1060,12 @@ public class AppointmentsController implements Initializable {
         filterHigher.setDisable(true);
     }
 
+    /**
+     * A button onAction function that creates a new window of relevant appointments for the contact selected by in
+     * the contactScheduleComboBox gui element.
+     * @throws SQLException
+     * @throws IOException
+     */
     public void viewContactSchedule() throws SQLException, IOException {
         if (contactScheduleComboBox.getSelectionModel().isEmpty()){
             AlertBox.display("Error!", "No contact has been selected!");
@@ -1079,6 +1099,10 @@ public class AppointmentsController implements Initializable {
         stage.show();
     }
 
+    /**
+     * A button onAction function that refreshes the monthly report tableview items, located at bottom right of the gui.
+     * @throws SQLException
+     */
     public void refreshMonthlyReport() throws SQLException {
         for (String s : Monthly.numberOfMap.keySet()){
             Monthly.numberOfMap.put(s, 0);
