@@ -9,8 +9,6 @@ import Model.Customer;
 import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;

@@ -3,6 +3,7 @@ package com.example.appointmentmanager;
 import helper.AlertBox;
 import helper.JDBC;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,13 +21,14 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
+import java.util.ResourceBundle;
 
 import static com.example.appointmentmanager.HelloApplication.window;
 
 /**
  * The log-in form for the English case of the gui.
  */
-public class HelloController {
+public class HelloController implements Initializable {
 
     /** a Button element of the gui implementation **/
     public TextField usernameTextField;
@@ -64,6 +67,21 @@ public class HelloController {
      * A PrintWriter object to append to the File object that contains all of the attempted logins.
      */
     public static PrintWriter pr = new PrintWriter(fr);
+
+    /**
+     * A label element of the gui interface.
+     */
+    public Label zoneLabelEN;
+
+    /**
+     * A function to initialize the zone id on the label in the log-in interface.
+     * @param url is a default javafx parameter
+     * @param resourceBundle is a default javafx parameter
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        zoneLabelEN.setText(String.valueOf(ZoneId.of(Calendar.getInstance().getTimeZone().getID())));
+    }
 
     /**
      * A function using the PrinterWriter object to append the String parameter into the File object that contains all
