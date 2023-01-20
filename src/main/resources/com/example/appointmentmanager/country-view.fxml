@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="283.0" prefWidth="222.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.appointmentmanager.countryController">
+   <children>
+      <TableView fx:id="countryTableView" layoutX="24.0" layoutY="21.0" prefHeight="218.0" prefWidth="174.0">
+        <columns>
+          <TableColumn fx:id="cAmount" prefWidth="60.0" text="Amount" />
+          <TableColumn fx:id="cCountry" prefWidth="112.0" text="Country" />
+        </columns>
+      </TableView>
+      <Button layoutX="94.0" layoutY="244.0" mnemonicParsing="false" onAction="#exitApp" text="Exit" />
+   </children>
+</AnchorPane>

@@ -1,17 +1,16 @@
 package com.example.appointmentmanager;
 import DBAccess.Appointments;
-import helper.AppointmentsTime;
+import helper.*;
 import DBAccess.Contacts;
 import DBAccess.Customers;
 import Model.Appointment;
 import Model.Contact;
 import Model.Customer;
 import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
-import helper.AlertBox;
-import helper.JDBC;
-import helper.Monthly;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -473,6 +472,7 @@ public class AppointmentsController implements Initializable {
         tempCustomers = Customers.getAllCustomers();
         customerDisable();
         dynamicLabel.setText("Select an Option:");
+        addAppointment.setDisable(false);
     }
 
     /**
@@ -832,7 +832,7 @@ public class AppointmentsController implements Initializable {
                         AlertBox.display("Alert", "Appointment was successfully deleted.");
                     }
                     else {
-                        AlertBox.display("Alert", "Appointment could not be deleted while having associated parts.");
+                        AlertBox.display("Alert", "Appointment could not be deleted.");
                     }
                 }
             else {
@@ -852,9 +852,14 @@ public class AppointmentsController implements Initializable {
     public void appointmentsMonthly() throws SQLException {
         customerDisable();
         appointmentDisable();
+        tempAppointments = Appointments.getAllAppointments();
+        if (tempAppointments.isEmpty()){
+            AlertBox.display("Alert!", "There are no appointments to filter.");
+            monthlyFilter.setSelected(false);
+            return;
+        }
         filterLower.setDisable(false);
         filterHigher.setDisable(false);
-        tempAppointments = Appointments.getAllAppointments();
         LocalDateTime min = null;
         if (referenceFrame.getText().equals("All")){
             for (Appointment a : tempAppointments){
@@ -891,9 +896,14 @@ public class AppointmentsController implements Initializable {
     public void appointmentsWeekly() throws SQLException {
         customerDisable();
         appointmentDisable();
+        tempAppointments = Appointments.getAllAppointments();
+        if (tempAppointments.isEmpty()){
+            AlertBox.display("Alert!", "There are no appointments to filter.");
+            weeklyFilter.setSelected(false);
+            return;
+        }
         filterLower.setDisable(false);
         filterHigher.setDisable(false);
-        tempAppointments = Appointments.getAllAppointments();
         LocalDateTime min = null;
         int c = 0;
         if (referenceFrame.getText().equals("All")) {
@@ -1054,6 +1064,7 @@ public class AppointmentsController implements Initializable {
      * @throws SQLException
      */
     public void refreshMonthlyReport() throws SQLException {
+        Monthly.numberOfMap.clear();
         for (String s : Monthly.numberOfMap.keySet()){
             Monthly.numberOfMap.put(s, 0);
         }
@@ -1069,9 +1080,48 @@ public class AppointmentsController implements Initializable {
                 new Monthly(month, type);
             }
         }
-        mMonth.setCellValueFactory(new PropertyValueFactory<>("month"));
-        mType.setCellValueFactory(new PropertyValueFactory<>("type"));
-        mNumber.setCellValueFactory(new PropertyValueFactory<>("numberOf"));
-        monthlyReportTableView.setItems(tempList);
+        if (tempList.isEmpty()){
+            AlertBox.display("Alert!", "There are no appointments.");
+            monthlyReportTableView.setItems(null);
+            return;
+        } else {
+            mMonth.setCellValueFactory(new PropertyValueFactory<>("month"));
+            mType.setCellValueFactory(new PropertyValueFactory<>("type"));
+            mNumber.setCellValueFactory(new PropertyValueFactory<>("numberOf"));
+            monthlyReportTableView.setItems(tempList);
+        }
+    }
+
+    /**
+     * A function that adds the number of customers with common countries to set as the items for a new tableview
+     * in a separate window.
+     * @throws IOException
+     * @throws SQLException
+     */
+    public void viewCountryReport( ) throws IOException, SQLException {
+        ObservableList tempList = FXCollections.observableArrayList();
+        for (Customer c : Customers.getAllCustomers()){
+            String country = c.getCountry();
+            if (CountryCount.numberOfMap.get(country) == null){
+                tempList.add(new CountryCount(country));
+            }
+            else {
+                new CountryCount(country);
+            }
+        }
+        if (tempList.isEmpty()){
+            AlertBox.display("Alert!", "There are no appointments.");
+            return;
+        } else {
+            countryController.countryCount = tempList;
+            Parent root;
+            root = FXMLLoader.load(HelloApplication.class.getResource("country-view.fxml"));
+            Stage stage = new Stage();
+            stage.setTitle("Report");
+            stage.setScene(new Scene(root, 222, 286));
+            stage.show();
+            CountryCount.numberOfMap.clear();
+        }
+
     }
 }

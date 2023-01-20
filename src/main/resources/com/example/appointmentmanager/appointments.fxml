@@ -74,47 +74,48 @@
     <Button fx:id="cancelCustomer" layoutX="933.0" layoutY="205.0" mnemonicParsing="false" onAction="#cancelCustomer" prefHeight="25.0" prefWidth="59.0" text="Cancel" />
     <Label layoutX="251.0" layoutY="275.0" text="Start:" />
     <Label layoutX="256.0" layoutY="308.0" text="End:" />
-    <RadioButton fx:id="monthlyFilter" layoutX="250.0" layoutY="639.0" mnemonicParsing="false" onAction="#appointmentsMonthly" text="month">
+    <RadioButton fx:id="monthlyFilter" layoutX="221.0" layoutY="639.0" mnemonicParsing="false" onAction="#appointmentsMonthly" text="month">
       <toggleGroup>
          <ToggleGroup fx:id="filterGroup" />
       </toggleGroup></RadioButton>
-    <RadioButton fx:id="weeklyFilter" layoutX="317.0" layoutY="639.0" mnemonicParsing="false" onAction="#appointmentsWeekly" text="week" toggleGroup="$filterGroup" />
-    <Button fx:id="modifyAppointment" layoutX="46.0" layoutY="666.0" mnemonicParsing="false" onAction="#modifyAppointment" text="Modify Appointment" />
+    <RadioButton fx:id="weeklyFilter" layoutX="288.0" layoutY="639.0" mnemonicParsing="false" onAction="#appointmentsWeekly" text="week" toggleGroup="$filterGroup" />
+    <Button fx:id="modifyAppointment" layoutX="32.0" layoutY="666.0" mnemonicParsing="false" onAction="#modifyAppointment" text="Modify Appointment" />
     <Label fx:id="dynamicLabel" layoutX="721.0" layoutY="275.0" prefHeight="126.0" prefWidth="276.0" text="Select an Option:" wrapText="true">
         <font>
           <Font size="31.0" />
         </font>
     </Label>
-    <Button fx:id="addAppointment" layoutX="46.0" layoutY="635.0" mnemonicParsing="false" onAction="#addAppointment" prefHeight="25.0" prefWidth="127.0" text="Add Appointment" />
+    <Button fx:id="addAppointment" layoutX="32.0" layoutY="635.0" mnemonicParsing="false" onAction="#addAppointment" prefHeight="25.0" prefWidth="127.0" text="Add Appointment" />
     <Button fx:id="addCustomer" layoutX="618.0" layoutY="205.0" mnemonicParsing="false" onAction="#addCustomer" prefHeight="25.0" prefWidth="127.0" text="Add Customer" />
     <Button fx:id="modifyCustomer" layoutX="762.0" layoutY="205.0" mnemonicParsing="false" onAction="#modifyCustomer" text="Modify Customer" />
-    <Button fx:id="deleteAppointment" layoutX="46.0" layoutY="696.0" mnemonicParsing="false" onAction="#deleteAppointment" prefHeight="25.0" prefWidth="127.0" text="Delete Appointment" />
+    <Button fx:id="deleteAppointment" layoutX="32.0" layoutY="696.0" mnemonicParsing="false" onAction="#deleteAppointment" prefHeight="25.0" prefWidth="127.0" text="Delete Appointment" />
    <Button fx:id="deleteCustomer" layoutX="764.0" layoutY="240.0" mnemonicParsing="false" onAction="#deleteCustomer" text="Delete Customer" />
    <DatePicker fx:id="endDatePick" layoutX="280.0" layoutY="304.0" prefHeight="25.0" prefWidth="136.0" promptText="Date / Local Time" />
    <DatePicker fx:id="startDatePick" layoutX="281.0" layoutY="271.0" prefHeight="25.0" prefWidth="136.0" promptText="Date / Local Time" />
    <ComboBox fx:id="startTimePick" layoutX="421.0" layoutY="271.0" prefHeight="25.0" prefWidth="127.0" />
    <ComboBox fx:id="endTimePick" layoutX="421.0" layoutY="304.0" prefHeight="25.0" prefWidth="127.0" />
-   <Button fx:id="filterHigher" layoutX="387.0" layoutY="635.0" mnemonicParsing="false" text="&gt;" />
-   <Button fx:id="filterLower" layoutX="214.0" layoutY="635.0" mnemonicParsing="false" text="&lt;" />
-   <Button layoutX="292.0" layoutY="696.0" mnemonicParsing="false" onAction="#clearFilter" text="Clear" />
-   <Label layoutX="208.0" layoutY="670.0" text="Frame of Reference:" />
-   <Label fx:id="referenceFrame" layoutX="321.0" layoutY="670.0" prefHeight="18.0" prefWidth="150.0" text="All" />
+   <Button fx:id="filterHigher" layoutX="358.0" layoutY="635.0" mnemonicParsing="false" text="&gt;" />
+   <Button fx:id="filterLower" layoutX="185.0" layoutY="635.0" mnemonicParsing="false" text="&lt;" />
+   <Button layoutX="263.0" layoutY="696.0" mnemonicParsing="false" onAction="#clearFilter" text="Clear" />
+   <Label layoutX="178.0" layoutY="670.0" text="Frame of Reference:" />
+   <Label fx:id="referenceFrame" layoutX="291.0" layoutY="670.0" prefHeight="18.0" prefWidth="150.0" text="All" />
    <Label layoutX="466.0" layoutY="631.0" text="Current Time Zone:" />
    <Label layoutX="479.0" layoutY="654.0" text="Clinic time Zone:" />
    <Label fx:id="clinicTimeZoneLabel" layoutX="578.0" layoutY="654.0" text="EST -5:00" />
    <Label fx:id="currentTimeZoneLabel" layoutX="578.0" layoutY="631.0" text="Null" />
    <ComboBox fx:id="contactScheduleComboBox" layoutX="723.0" layoutY="635.0" prefHeight="25.0" prefWidth="137.0" />
    <Button layoutX="865.0" layoutY="636.0" mnemonicParsing="false" onAction="#viewContactSchedule" text="View Contact Schedule" />
-   <TableView fx:id="monthlyReportTableView" layoutX="466.0" layoutY="674.0" prefHeight="71.0" prefWidth="535.0">
+   <TableView fx:id="monthlyReportTableView" layoutX="435.0" layoutY="674.0" prefHeight="71.0" prefWidth="440.0">
      <columns>
        <TableColumn fx:id="mMonth" prefWidth="124.0" text="Month" />
-       <TableColumn fx:id="mType" prefWidth="242.0" text="Type of Appointment" />
-         <TableColumn fx:id="mNumber" prefWidth="168.0" text="Number of Appointments" />
+       <TableColumn fx:id="mType" prefWidth="211.0" text="Type of Appointment" />
+         <TableColumn fx:id="mNumber" prefWidth="104.0" text="Number" />
      </columns>
    </TableView>
-   <Button layoutX="393.0" layoutY="675.0" mnemonicParsing="false" onAction="#refreshMonthlyReport" prefHeight="71.0" prefWidth="69.0" text="Refresh Monthly Report" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
+   <Button layoutX="362.0" layoutY="674.0" mnemonicParsing="false" onAction="#refreshMonthlyReport" prefHeight="71.0" prefWidth="69.0" text="Refresh Monthly Report" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
       <font>
          <Font size="11.0" />
       </font>
    </Button>
+   <Button layoutX="903.0" layoutY="678.0" mnemonicParsing="false" onAction="#viewCountryReport" prefHeight="64.0" prefWidth="76.0" text="View Country Report" textAlignment="CENTER" wrapText="true" />
 </AnchorPane>
