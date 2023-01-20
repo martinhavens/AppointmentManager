@@ -181,6 +181,8 @@ public class AppointmentsController implements Initializable {
     /**
      * Initialize tableviews and enables or disables the relevant main form objects.
      * Lambda with listeners to enable modify and delete buttons when a tableview element is selected.
+     * The lambda allows for listening to updates on tableview selections which when triggered will enable
+     * the modify and delete buttons for customers and/or appointments.
      * @param url is a default javafx parameter
      * @param resourceBundle is a default javafx parameter
      */
@@ -846,7 +848,8 @@ public class AppointmentsController implements Initializable {
      * A radiobutton onAction function that enables the relevant GUI elements, determines the appointment current in the
      * database with the earliest calendar date, and sets the initial appointment filter from the earliest appointment
      * date to one month in the future. And sets the appropriate function calls to the filter advancement buttons via
-     * lambda functions.
+     * lambda functions. Two lambda functions allow easy access to the event handlers while being accompanied with written
+     * functions to set as a button's GUI action event.
      * @throws SQLException
      */
     public void appointmentsMonthly() throws SQLException {
@@ -890,7 +893,8 @@ public class AppointmentsController implements Initializable {
      * A radiobutton onAction function that enables the relevant GUI elements, determines the appointment current in the
      * database with the earliest calendar date, and sets the initial appointment filter from the earliest appointment
      * date to one week in the future. And sets the appropriate function calls to the filter advancement buttons via
-     * lambda functions.
+     * lambda functions. Two lambda functions allow easy access to the event handlers while being accompanied with written
+     * functions to set as a button's GUI action event.
      * @throws SQLException
      */
     public void appointmentsWeekly() throws SQLException {

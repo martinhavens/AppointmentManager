@@ -12,6 +12,8 @@ import javafx.geometry.*;
 public class AlertBox {
     /**
      * Displays a dialogue window with the selected title and message with a button to close the window.
+     * A lambda function allows easy access to the event handler while being accompanied with a written
+     * functions to set as a button's GUI action event.
      * @param title sets the title of the alert box.
      * @param message sets the message contents of the box.
      */
