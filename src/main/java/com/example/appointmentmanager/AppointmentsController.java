@@ -827,9 +827,12 @@ public class AppointmentsController implements Initializable {
      */
     public void deleteAppointment() throws SQLException {
             if (!aTableView.getSelectionModel().isEmpty()) {
+                Appointment deletedItem = aTableView.getSelectionModel().getSelectedItem();
+                String deletedType = deletedItem.getType();
+                int deletedID = deletedItem.getAppointmentID();
                     if (Appointments.deleteAppointment(Appointments.getAllAppointments().get(aTableView.getSelectionModel().getSelectedIndex()))){
                         aTableView.getSelectionModel().clearSelection();
-                        AlertBox.display("Alert", "Appointment was successfully deleted.");
+                        AlertBox.display("Alert", String.format("Appointment %d - Type: %s, was successfully deleted.", deletedID, deletedType));
                     }
                     else {
                         AlertBox.display("Alert", "Appointment could not be deleted.");

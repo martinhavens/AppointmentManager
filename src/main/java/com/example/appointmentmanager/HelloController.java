@@ -46,7 +46,7 @@ public class HelloController implements Initializable {
     /**
      * a File object to contain all of the attempted logins.
      */
-    public static File myObj = new File("./loginlog.txt");
+    public static File myObj = new File("./login_activity.txt");
     /**
      * A FileWriter object to append to the File object that contains all of the attempted logins.
      */

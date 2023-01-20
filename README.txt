@@ -9,7 +9,7 @@ Run the program by opening the AppointmentManager project in IntelliJ. Run Hello
 and password.
 
 To add a Customer:
-Click on "Add Customer", Enter a Name, Address, Phone Numner, Postal Code. Select a Country then select a division.
+Click on "Add Customer", Enter a Name, Address, Phone Number, Postal Code. Select a Country then select a division.
 Click the save button to the right of the modify customer button.
 
 To add an Appointment:
@@ -19,7 +19,7 @@ above the User ID text label.
 
 To filter Appointments by month or week:
 Verify that at least one appointment is added to the database. With the filter cleared and the Frame of Reference label
-as "All", click on the month or week radio button. Advance forward or backward in the filter by click on the left or
+as "All", click on the month or week radio button. Advance forward or backward in the filter by clicking on the left or
 right arrow buttons to the left and the right of the radio buttons.
 
 To modify a Customer:
